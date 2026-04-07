@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANI 会议助手 v3</title>
+<script>
+// ── docx.js 动态加载（多源降级）──
+window._docxReady = false;
+window._docxError = false;
+(function loadDocx() {
+  const sources = [
+    'https://unpkg.com/docx@8.5.0/build/index.umd.js',
+    'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js',
+  ];
+  let idx = 0;
+  function tryNext() {
+    if (idx >= sources.length) { window._docxError = true; return; }
+    const s = document.createElement('script');
+    s.src = sources[idx++];
+    s.onload = () => { window._docxReady = true; };
+    s.onerror = () => tryNext();
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg:#0a0c10;
+    --sur:#111318;
+    --sur2:#181c24;
+    --sur3:#1e2330;
+    --bd:rgba(255,255,255,0.07);
+    --bd2:rgba(255,255,255,0.12);
+    --txt:#dde3f0;
+    --tm:rgba(255,255,255,0.38);
+    --td:rgba(255,255,255,0.16);
+    --g:#00c47d;
+    --gl:#4ddba0;
+    --gb:rgba(0,196,125,0.10);
+    --gbd:rgba(0,196,125,0.22);
+    --r:#f05252;
+    --rb:rgba(240,82,82,0.10);
+    --b:#4d9de0;
+    --bb:rgba(77,157,224,0.10);
+    --a:#f5a623;
+    --ab:rgba(245,166,35,0.10);
+    --p:#9b8ce8;
+    --pb:rgba(155,140,232,0.10);
+    --rr:10px; --rs:6px;
+    --mono:'JetBrains Mono',monospace;
+    --sans:'Noto Sans SC',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:var(--bg);color:var(--txt);font-family:var(--sans)}
+
+  /* ── 布局 ── */
+  .app{display:grid;grid-template-columns:1fr 340px;grid-template-rows:52px 1fr 64px;height:100vh;overflow:hidden}
+  header{grid-column:1/-1;background:var(--sur);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+  main{padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:0}
+  aside{background:var(--sur);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+  footer{grid-column:1/-1;background:var(--sur);border-top:1px solid var(--bd);display:flex;align-items:center;gap:8px;padding:0 16px}
+
+  /* ── 顶栏 ── */
+  .logo{display:flex;align-items:center;gap:10px}
+  .lmark{width:26px;height:26px;background:var(--g);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;font-family:var(--mono)}
+  .lname{font-size:14px;font-weight:600;letter-spacing:.02em}
+  .lroom{font-size:12px;color:var(--tm);margin-left:2px;font-family:var(--mono)}
+  .topright{display:flex;align-items:center;gap:10px}
+  .timerbox{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;font-family:var(--mono);background:var(--sur2);border:1px solid var(--bd);padding:4px 12px;border-radius:var(--rs);letter-spacing:.08em}
+  .rpill{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;font-size:11px;font-weight:600;letter-spacing:.04em}
+  .rpill.on{background:var(--rb);color:var(--r)}
+  .rpill.off{background:var(--sur2);color:var(--tm)}
+  .rpill.async{background:var(--ab);color:var(--a)}
+  .rdot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .rpill.on .rdot{animation:pulse 1.4s ease-in-out infinite}
+  .rpill.async .rdot{animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+  /* ── 字幕区 ── */
+  .subcard{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rr);padding:18px 22px;flex-shrink:0;position:relative;overflow:hidden}
+  .subcard::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,196,125,.04),transparent 60%);pointer-events:none}
+  .subsp{font-size:10px;font-weight:600;color:var(--gl);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;font-family:var(--mono);min-height:13px}
+  .subtxt{font-size:26px;font-weight:500;line-height:1.5;min-height:78px;word-break:break-all}
+  .cursor{display:inline-block;width:2px;height:24px;background:var(--gl);margin-left:3px;vertical-align:middle;border-radius:1px;animation:blink 1s step-end infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  .subidle{font-size:15px;color:var(--td)}
+
+  /* ── 历史 ── */
+  .histcard{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rr);padding:14px 18px;flex:1;overflow-y:auto;min-height:0}
+  .slabel{font-size:10px;font-weight:600;color:var(--tm);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;font-family:var(--mono)}
+  .hlist{display:flex;flex-direction:column;gap:8px}
+  .hitem{display:flex;gap:9px}
+  .hav{width:24px;height:24px;border-radius:50%;background:var(--sur2);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--tm);flex-shrink:0;margin-top:1px;font-family:var(--mono)}
+  .hbody{flex:1}
+  .hname{font-size:10px;color:var(--tm);margin-bottom:2px;font-family:var(--mono)}
+  .htxt{font-size:13px;color:rgba(255,255,255,.68);line-height:1.65}
+  .htime{font-size:10px;color:var(--td);margin-top:2px;font-family:var(--mono)}
+
+  /* ── 异步横幅 ── */
+  .async-banner{display:none;background:linear-gradient(90deg,rgba(245,166,35,.08),rgba(245,166,35,.04));border:1px solid rgba(245,166,35,.3);border-radius:var(--rs);padding:10px 14px;font-size:12px;color:var(--a);align-items:center;gap:10px;flex-shrink:0}
+  .async-banner.show{display:flex}
+  .spin{width:14px;height:14px;border:2px solid rgba(245,166,35,.25);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* 完成横幅 */
+  .done-banner{display:none;background:linear-gradient(90deg,rgba(0,196,125,.08),rgba(0,196,125,.04));border:1px solid rgba(0,196,125,.3);border-radius:var(--rs);padding:10px 14px;font-size:12px;color:var(--gl);align-items:center;gap:10px;flex-shrink:0}
+  .done-banner.show{display:flex}
+
+  /* ── 侧栏 ── */
+  .stabs{display:flex;border-bottom:1px solid var(--bd);flex-shrink:0}
+  .stab{flex:1;padding:10px 0;text-align:center;font-size:11px;color:var(--tm);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;font-weight:500}
+  .stab.on{color:var(--gl);border-bottom-color:var(--gl)}
+  .sbody{flex:1;overflow-y:auto;padding:14px;min-height:0}
+  .sp{display:none}.sp.on{display:block}
+
+  /* ── 表单 ── */
+  .fg{margin-bottom:14px}
+  .fl{font-size:10px;font-weight:600;color:var(--tm);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;font-family:var(--mono)}
+  .fi{width:100%;background:var(--sur2);border:1px solid var(--bd);border-radius:var(--rs);padding:7px 10px;color:var(--txt);font-size:12px;font-family:var(--mono);outline:none;transition:border .15s}
+  .fi:focus{border-color:rgba(0,196,125,.5)}
+  .fi::placeholder{color:var(--td)}
+  .fhint{font-size:11px;color:var(--td);margin-top:4px;line-height:1.5}
+  .fhint a{color:var(--gl);text-decoration:none}
+  .savebtn{width:100%;padding:8px;background:var(--gb);color:var(--gl);border:1px solid rgba(0,196,125,.4);border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--sans);letter-spacing:.03em;margin-top:4px}
+  .savebtn:hover{background:var(--g);color:#000}
+
+  /* ── 纪要列表 ── */
+  .reclist{display:flex;flex-direction:column;gap:8px}
+  .recitem{background:var(--sur2);border-radius:var(--rs);padding:10px 12px;border:1px solid var(--bd);cursor:pointer;transition:border .15s}
+  .recitem:hover{border-color:var(--bd2)}
+  .rechead{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+  .recroom{font-size:12px;font-weight:600;color:var(--txt)}
+  .rectime{font-size:10px;color:var(--td);font-family:var(--mono)}
+  .recmeta{font-size:11px;color:var(--tm);margin-bottom:6px;font-family:var(--mono)}
+  .recstatus{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;letter-spacing:.04em}
+  .recstatus.ok{background:var(--gb);color:var(--gl)}
+  .recstatus.pending{background:var(--ab);color:var(--a)}
+  .recstatus.fail{background:var(--rb);color:var(--r)}
+  .recbtn{font-size:11px;padding:2px 8px;border-radius:var(--rs);border:1px solid var(--bd);background:transparent;color:var(--tm);cursor:pointer;font-family:var(--sans);transition:all .15s;margin-left:6px}
+  .recbtn:hover{background:var(--sur);color:var(--txt)}
+  .empty-hint{font-size:12px;color:var(--td);text-align:center;padding:24px 0;font-family:var(--mono)}
+
+  /* ── 统计卡片 ── */
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px}
+  .stat-card{background:var(--sur2);border-radius:var(--rs);padding:10px 8px;text-align:center;border:1px solid var(--bd)}
+  .stat-num{font-size:20px;font-weight:700;font-family:var(--mono);color:var(--gl)}
+  .stat-lbl{font-size:9px;color:var(--td);margin-top:2px;text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)}
+
+  /* ── 底栏 ── */
+  .btn{padding:0 14px;height:40px;border-radius:var(--rs);border:1px solid var(--bd);background:var(--sur2);color:var(--txt);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:var(--sans);display:flex;align-items:center;gap:6px;letter-spacing:.02em}
+  .btn:hover{border-color:var(--bd2)}
+  .btn.primary{background:var(--g);border-color:var(--g);color:#000;font-weight:700}
+  .btn.primary:hover{background:#00e090}
+  .btn.danger{background:var(--rb);border-color:rgba(240,82,82,.4);color:var(--r)}
+  .btn.danger:hover{background:var(--r);color:#fff}
+  .btn.accent{background:var(--pb);border-color:rgba(155,140,232,.4);color:var(--p)}
+  .btn:disabled{opacity:.3;cursor:not-allowed}
+  .spacer{flex:1}
+  .pstatus{font-size:11px;color:var(--tm);display:flex;align-items:center;gap:5px;font-family:var(--mono)}
+  .pdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+
+  /* ── 弹层 ── */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(6px)}
+  .modal{background:var(--sur);border:1px solid var(--bd2);border-radius:14px;width:780px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.6)}
+  .mhead{padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .mtitle{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .mbadge{font-size:10px;background:var(--gb);color:var(--gl);padding:2px 8px;border-radius:99px;font-weight:600;font-family:var(--mono)}
+  .mclose{width:24px;height:24px;border-radius:50%;background:var(--sur2);border:none;color:var(--tm);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .mbody{flex:1;overflow-y:auto;padding:18px}
+  .mfoot{padding:10px 18px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;flex-shrink:0}
+  .loading{display:flex;align-items:center;gap:12px;color:var(--tm);font-size:13px;padding:32px 0;font-family:var(--mono)}
+  .bigspin{width:18px;height:18px;border:2px solid var(--bd2);border-top-color:var(--gl);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+
+  /* ══════════════════════════════════
+     纪要模板样式
+  ══════════════════════════════════ */
+  .min-wrap{display:flex;flex-direction:column;gap:14px}
+
+  /* 头部信息卡 */
+  .min-header{background:linear-gradient(135deg,rgba(0,196,125,.07),rgba(0,196,125,.02));border:1px solid rgba(0,196,125,.2);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .min-header-title{grid-column:1/-1;font-size:15px;font-weight:700;color:var(--gl);margin-bottom:4px;letter-spacing:.03em}
+  .mh-item{display:flex;flex-direction:column;gap:2px}
+  .mh-label{font-size:9px;font-weight:600;color:var(--td);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)}
+  .mh-value{font-size:12px;color:var(--txt);font-family:var(--mono);font-weight:500}
+
+  /* 概要卡 */
+  .min-section{background:var(--sur2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px}
+  .min-sec-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .min-sec-icon{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+  .icon-summary{background:rgba(77,157,224,.15);color:var(--b)}
+  .icon-topic{background:rgba(155,140,232,.15);color:var(--p)}
+  .icon-action{background:rgba(0,196,125,.15);color:var(--gl)}
+  .icon-followup{background:rgba(245,166,35,.15);color:var(--a)}
+  .min-sec-title{font-size:11px;font-weight:600;color:var(--txt);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)}
+  .min-summary-text{font-size:13px;color:rgba(255,255,255,.72);line-height:1.75}
+
+  /* 议题列表 */
+  .topic-list{display:flex;flex-direction:column;gap:8px}
+  .topic-item{border-left:2px solid var(--p);padding:8px 12px;background:rgba(155,140,232,.04);border-radius:0 5px 5px 0}
+  .topic-title{font-size:12px;font-weight:600;color:var(--p);margin-bottom:3px}
+  .topic-conclusion{font-size:12px;color:rgba(255,255,255,.65);line-height:1.6}
+
+  /* 行动事项表格 */
+  .action-table{width:100%;border-collapse:collapse}
+  .action-table th{font-size:9px;font-weight:600;color:var(--td);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);text-align:left;padding:5px 8px;border-bottom:1px solid var(--bd);background:rgba(0,196,125,.04)}
+  .action-table td{font-size:12px;padding:8px;border-bottom:1px solid var(--bd);vertical-align:top;color:rgba(255,255,255,.72);line-height:1.5}
+  .action-table tr:last-child td{border-bottom:none}
+  .action-table .td-owner{color:var(--gl);font-weight:600;font-family:var(--mono);font-size:11px;white-space:nowrap}
+  .action-table .td-ddl{color:var(--a);font-family:var(--mono);font-size:11px;white-space:nowrap}
+  .action-prio{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;font-family:var(--mono);letter-spacing:.04em;margin-right:4px}
+  .prio-high{background:var(--rb);color:var(--r)}
+  .prio-mid{background:var(--ab);color:var(--a)}
+  .prio-low{background:var(--sur);color:var(--tm)}
+
+  /* 跟进事项 */
+  .followup-list{display:flex;flex-direction:column;gap:6px}
+  .followup-item{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.12);border-radius:5px}
+  .followup-dot{width:5px;height:5px;border-radius:50%;background:var(--a);flex-shrink:0;margin-top:5px}
+  .followup-text{font-size:12px;color:rgba(255,255,255,.65);line-height:1.6}
+
+  /* 无内容占位 */
+  .none-hint{font-size:12px;color:var(--td);font-family:var(--mono);padding:6px 0}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- 顶栏 -->
+<header>
+  <div class="logo">
+    <div class="lmark">S</div>
+    <span class="lname">SANI 会议助手</span>
+    <span class="lroom" id="room-label">/ 会议室 A</span>
+  </div>
+  <div class="topright">
+    <div class="timerbox" id="timer">00:00:00</div>
+    <div class="rpill off" id="rpill"><div class="rdot"></div><span id="rtxt">未开始</span></div>
+  </div>
+</header>
+
+<!-- 主区 -->
+<main>
+  <!-- 异步生成横幅 -->
+  <div class="async-banner" id="async-banner">
+    <div class="spin"></div>
+    <span id="async-msg">AI 正在分析会议内容，生成纪要中...</span>
+  </div>
+  <!-- 完成横幅 -->
+  <div class="done-banner" id="done-banner">
+    <span>✓</span>
+    <span id="done-msg">纪要已生成，可在「历史纪要」查看</span>
+    <button class="recbtn" id="done-view-btn" onclick="viewLastRecord()" style="margin-left:auto">立即查看</button>
+  </div>
+
+  <!-- 字幕卡 -->
+  <div class="subcard">
+    <div class="subsp" id="cur-sp"></div>
+    <div class="subtxt" id="cur-txt"><span class="subidle">点击「开始会议」，说话内容将实时显示在这里...</span></div>
+  </div>
+
+  <!-- 历史记录 -->
+  <div class="histcard">
+    <div class="slabel">实时记录</div>
+    <div class="hlist" id="hlist"><div style="color:var(--td);font-size:12px;text-align:center;padding:16px 0;font-family:var(--mono)" data-ph>会议开始后记录显示在这里</div></div>
+  </div>
+</main>
+
+<!-- 侧栏 -->
+<aside>
+  <div class="stabs">
+    <div class="stab on" onclick="stab('cfg',this)">配置</div>
+    <div class="stab" onclick="stab('rec',this)">历史纪要 <span id="rec-badge"></span></div>
+    <div class="stab" onclick="stab('stats',this)">统计</div>
+  </div>
+  <div class="sbody">
+
+    <!-- 配置 -->
+    <div class="sp on" id="sp-cfg">
+      <div class="fg">
+        <div class="fl">会议室名称</div>
+        <input class="fi" id="cfg-room" placeholder="如：会议室A" value="会议室 A">
+      </div>
+      <div class="fg">
+        <div class="fl">默认发言人</div>
+        <input class="fi" id="cfg-speaker" placeholder="如：张总" value="发言人">
+      </div>
+
+      <!-- ── 模型提供商 ── -->
+      <div class="fg">
+        <div class="fl">模型提供商</div>
+        <select class="fi" id="cfg-provider" onchange="onProviderChange()" style="cursor:pointer">
+          <option value="qwen">阿里云通义</option>
+          <option value="deepseek">DeepSeek</option>
+          <option value="openai">OpenAI</option>
+          <option value="volc">火山引擎（豆包）</option>
+          <option value="moonshot">Moonshot（Kimi）</option>
+          <option value="yi">零一万物</option>
+          <option value="custom">自定义</option>
+        </select>
+      </div>
+
+      <!-- 模型选择 -->
+      <div class="fg" id="fg-model-select">
+        <div class="fl">模型</div>
+        <select class="fi" id="cfg-model-select" onchange="onModelSelectChange()" style="cursor:pointer"></select>
+      </div>
+      <!-- 火山：接入点 ID / 自定义：手填模型名 -->
+      <div class="fg" id="fg-model-input" style="display:none">
+        <div class="fl" id="lbl-model-input">模型 / 接入点 ID</div>
+        <input class="fi" id="cfg-model-input" placeholder="如：ep-20240101-xxxxx">
+        <div class="fhint" id="hint-model-input"></div>
+      </div>
+
+      <!-- 自定义 Base URL -->
+      <div class="fg" id="fg-base-url" style="display:none">
+        <div class="fl">Base URL</div>
+        <input class="fi" id="cfg-base-url" placeholder="https://your-api.com/v1">
+      </div>
+
+      <!-- API Key -->
+      <div class="fg">
+        <div class="fl">API Key</div>
+        <input class="fi" id="cfg-api" type="password" placeholder="sk-xxxxxxxxxxxxxxxx">
+        <div class="fhint" id="hint-api-key">
+          → <a id="link-api-key" href="https://dashscope.aliyun.com" target="_blank">dashscope.aliyun.com</a> 「API-KEY管理」创建
+        </div>
+      </div>
+
+      <!-- 详细程度 -->
+      <div class="fg">
+        <div class="fl">纪要详细程度</div>
+        <select class="fi" id="cfg-detail" style="cursor:pointer">
+          <option value="concise">简洁（重点摘要）</option>
+          <option value="standard" selected>标准（推荐）</option>
+          <option value="detailed">详细（完整内容）</option>
+        </select>
+      </div>
+
+      <button class="savebtn" onclick="saveConfig()">保存配置</button>
+    </div>
+
+    <!-- 历史纪要 -->
+    <div class="sp" id="sp-rec">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="slabel" style="margin-bottom:0">历史纪要</div>
+        <button class="recbtn" onclick="clearRecords()">清空</button>
+      </div>
+      <div class="reclist" id="reclist"><div class="empty-hint">暂无纪要</div></div>
+    </div>
+
+    <!-- 统计 -->
+    <div class="sp" id="sp-stats">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num" id="st-w">0</div><div class="stat-lbl">字数</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-l">0</div><div class="stat-lbl">句数</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-m">0</div><div class="stat-lbl">分钟</div></div>
+      </div>
+      <div class="fl" style="margin-bottom:8px">关键词</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px" id="kwlist">
+        <span style="font-size:12px;color:var(--td);font-family:var(--mono)">会议开始后自动提取</span>
+      </div>
+    </div>
+
+  </div>
+</aside>
+
+<!-- 底栏 -->
+<footer>
+  <button class="btn primary" id="btn-start" onclick="startMeeting()">● 开始会议</button>
+  <button class="btn" id="btn-pause" onclick="pauseMeeting()" disabled>暂停</button>
+  <button class="btn accent" id="btn-view" onclick="viewCurrent()" disabled>查看纪要</button>
+  <div class="spacer"></div>
+  <div class="pstatus" id="pstatus"></div>
+  <button class="btn danger" id="btn-end" onclick="endMeeting()" disabled>结束会议</button>
+</footer>
+
+</div>
+
+<!-- 纪要弹层 -->
+<div class="overlay" id="modal" style="display:none">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle">
+        <span>📋</span>
+        <span id="mtitle">会议纪要</span>
+        <span class="mbadge" id="mbadge">SANI</span>
+      </div>
+      <button class="mclose" onclick="closeModal()">✕</button>
+    </div>
+    <div class="mbody"><div id="mbody"></div></div>
+    <div class="mfoot">
+      <button class="btn" onclick="copyMin()">复制纯文本</button>
+      <button class="btn accent" id="btn-export-word" onclick="exportToWord()">⬇ 导出 Word</button>
+      <button class="btn primary" onclick="closeModal()">关闭</button>
+    </div>
+  </div>
+</div>
+<textarea id="raw-min" style="display:none"></textarea>
+
+<script>
+// ══════════════════════════════════
+//  配置
+// ══════════════════════════════════
+let CFG = {
+  room: '会议室 A',
+  speaker: '发言人',
+  apiKey: '',
+  detail: 'standard',
+  provider: 'qwen',       // 提供商 key
+  model: 'qwen-plus',     // 当前模型
+  baseUrl: '',            // 自定义 base url（仅 custom 模式）
+};
+
+// ══════════════════════════════════
+//  状态
+// ══════════════════════════════════
+let running=false, paused=false;
+let timerSec=0, timerInt=null;
+let recog=null;
+let transcript=[];
+let wc=0, lc=0;
+let kws={};
+let currentMinutes='';
+let lastRecordId=null;
+let _modalData=null;   // 当前弹层数据，用于导出
+
+const ACT=['负责','跟进','确认','安排','完成','提交','汇报','整改','推进','落实','对接','处理'];
+const HOT=['问题','目标','计划','数据','销售','门店','复盘','方案','预算','库存','客户','产品','需求'];
+
+// ══════════════════════════════════
+//  语音识别
+// ══════════════════════════════════
+function initRecog() {
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if (!SR) { alert('请使用 Chrome 或 Edge 浏览器，并开启麦克风权限'); return null; }
+  const r=new SR();
+  r.lang='zh-CN'; r.continuous=true; r.interimResults=true; r.maxAlternatives=1;
+  r.onresult=e=>{
+    let tmp='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal) commitLine(t.trim()); else tmp+=t;
+    }
+    if(tmp) showInterim(tmp);
+  };
+  r.onerror=e=>{ if(e.error!=='no-speech') console.warn(e.error); };
+  r.onend=()=>{ if(running&&!paused) setTimeout(()=>{ try{r.start()}catch(e){} },300); };
+  return r;
+}
+
+function showInterim(t) {
+  document.getElementById('cur-sp').textContent=CFG.speaker;
+  document.getElementById('cur-txt').innerHTML=t+'<span class="cursor"></span>';
+}
+
+function commitLine(t) {
+  if(!t) return;
+  document.getElementById('cur-txt').innerHTML='<span class="cursor"></span>';
+  const now=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const e={time:now,speaker:CFG.speaker,text:t};
+  transcript.push(e);
+  addHistItem(e);
+  updateStats(t);
+}
+
+function addHistItem(e) {
+  const list=document.getElementById('hlist');
+  const ph=list.querySelector('[data-ph]'); if(ph) ph.remove();
+  const d=document.createElement('div'); d.className='hitem';
+  d.innerHTML=`<div class="hav">${e.speaker.slice(0,1)}</div><div class="hbody"><div class="hname">${e.speaker}</div><div class="htxt">${e.text}</div><div class="htime">${e.time}</div></div>`;
+  list.appendChild(d); list.scrollTop=list.scrollHeight;
+}
+
+// ══════════════════════════════════
+//  统计 & 关键词
+// ══════════════════════════════════
+function updateStats(t) {
+  wc+=t.length; lc++;
+  document.getElementById('st-w').textContent=wc;
+  document.getElementById('st-l').textContent=lc;
+  [...ACT,...HOT].forEach(k=>{ if(t.includes(k)) kws[k]=(kws[k]||0)+1; });
+  const el=document.getElementById('kwlist');
+  const sorted=Object.entries(kws).sort((a,b)=>b[1]-a[1]).slice(0,16);
+  if(!sorted.length) return;
+  el.innerHTML=sorted.map(([k,c])=>`<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:${ACT.includes(k)?'var(--bb)':'var(--ab)'};color:${ACT.includes(k)?'var(--b)':'var(--a)'};font-family:var(--mono)">${k}${c>1?' ×'+c:''}</span>`).join('');
+}
+
+// ══════════════════════════════════
+//  计时器
+// ══════════════════════════════════
+function startTimer() {
+  timerInt=setInterval(()=>{
+    timerSec++;
+    document.getElementById('st-m').textContent=Math.floor(timerSec/60);
+    const h=String(Math.floor(timerSec/3600)).padStart(2,'0');
+    const m=String(Math.floor((timerSec%3600)/60)).padStart(2,'0');
+    const s=String(timerSec%60).padStart(2,'0');
+    document.getElementById('timer').textContent=`${h}:${m}:${s}`;
+  },1000);
+}
+
+// ══════════════════════════════════
+//  会议控制
+// ══════════════════════════════════
+function startMeeting() {
+  recog=initRecog(); if(!recog) return;
+  running=true; paused=false;
+  hideDoneBanner();
+  setPill('on');
+  document.getElementById('cur-txt').innerHTML='<span class="cursor"></span>';
+  document.getElementById('cur-sp').textContent=CFG.speaker;
+  document.getElementById('hlist').innerHTML='';
+  document.getElementById('btn-start').disabled=true;
+  document.getElementById('btn-pause').disabled=false;
+  document.getElementById('btn-view').disabled=false;
+  document.getElementById('btn-end').disabled=false;
+  recog.start(); startTimer();
+  setStatus('录制中','green');
+}
+
+function pauseMeeting() {
+  paused=!paused;
+  const btn=document.getElementById('btn-pause');
+  if(paused){ recog.stop(); clearInterval(timerInt); setPill('off','已暂停'); btn.textContent='继续'; setStatus('已暂停','amber'); }
+  else { recog.start(); startTimer(); setPill('on'); btn.textContent='暂停'; setStatus('录制中','green'); }
+}
+
+function setPill(state, label='') {
+  const p=document.getElementById('rpill');
+  p.className='rpill '+state;
+  const map={on:'录制中',off:'待机',async:'生成中'};
+  document.getElementById('rtxt').textContent=label||(map[state]||state);
+}
+
+// ══════════════════════════════════
+//  结束会议 → 异步生成纪要
+// ══════════════════════════════════
+function endMeeting() {
+  if(!confirm('确认结束会议？\nAI 将在后台生成结构化纪要，无需等待。')) return;
+
+  running=false; paused=false;
+  if(recog) recog.stop();
+  clearInterval(timerInt);
+  setPill('async');
+
+  document.getElementById('btn-start').disabled=false;
+  document.getElementById('btn-pause').disabled=true;
+  document.getElementById('btn-end').disabled=true;
+
+  const snap = {
+    id: Date.now(),
+    room: CFG.room,
+    duration: timerSec,
+    startAt: new Date(Date.now()-timerSec*1000).toLocaleString('zh-CN'),
+    endAt: new Date().toLocaleString('zh-CN'),
+    transcript: [...transcript],
+    status: 'pending',
+    minutes: null,
+    error: ''
+  };
+
+  lastRecordId = snap.id;
+  saveRecord(snap);
+  showAsyncBanner('AI 正在分析会议内容，生成结构化纪要...');
+
+  // 异步，不 await
+  runAsyncJob(snap).catch(err => console.error('异步任务异常:', err));
+  setStatus('后台生成中...','amber');
+}
+
+// ══════════════════════════════════
+//  核心异步任务
+// ══════════════════════════════════
+async function runAsyncJob(snap) {
+  try {
+    updateAsyncBanner('正在调用 AI 分析会议内容...');
+    const minutes = await generateMinutes(snap);
+    snap.minutes = minutes;
+    currentMinutes = minutes;
+    snap.status = 'ok';
+    setStatus('纪要已生成 ✓','green');
+    hideAsyncBanner();
+    showDoneBanner(`${snap.room} 纪要已生成，点击查看`);
+  } catch(err) {
+    snap.status = 'fail';
+    snap.error = err.message;
+    setStatus('生成失败，可在历史纪要重试','red');
+    hideAsyncBanner();
+  } finally {
+    saveRecord(snap);
+    renderRecords();
+    setPill('off','已结束');
+    // 重置
+    transcript=[]; wc=0; lc=0; kws={}; timerSec=0;
+    document.getElementById('timer').textContent='00:00:00';
+    document.getElementById('cur-txt').innerHTML='<span class="subidle">点击「开始会议」，说话内容将实时显示在这里...</span>';
+    document.getElementById('cur-sp').textContent='';
+    document.getElementById('st-w').textContent='0';
+    document.getElementById('st-l').textContent='0';
+    document.getElementById('st-m').textContent='0';
+  }
+}
+
+// ══════════════════════════════════
+//  提供商配置表
+// ══════════════════════════════════
+const PROVIDERS = {
+  qwen: {
+    name: '阿里云通义',
+    baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    models: [
+      { id:'qwen-plus',  label:'Qwen-Plus（推荐）' },
+      { id:'qwen-turbo', label:'Qwen-Turbo（快速）' },
+      { id:'qwen-max',   label:'Qwen-Max（最强）' },
+    ],
+    keyLink: 'https://dashscope.aliyun.com',
+    keyHint: '「API-KEY管理」→ 创建',
+    modelMode: 'select',
+  },
+  deepseek: {
+    name: 'DeepSeek',
+    baseUrl: 'https://api.deepseek.com/v1',
+    models: [
+      { id:'deepseek-chat',     label:'DeepSeek-Chat V3（推荐）' },
+      { id:'deepseek-reasoner', label:'DeepSeek-Reasoner R1（推理）' },
+    ],
+    keyLink: 'https://platform.deepseek.com',
+    keyHint: '「API Keys」→ 创建',
+    modelMode: 'select',
+  },
+  openai: {
+    name: 'OpenAI',
+    baseUrl: 'https://api.openai.com/v1',
+    models: [
+      { id:'gpt-4o-mini', label:'GPT-4o mini（推荐，便宜）' },
+      { id:'gpt-4o',      label:'GPT-4o（最强）' },
+      { id:'gpt-4-turbo', label:'GPT-4 Turbo' },
+    ],
+    keyLink: 'https://platform.openai.com/api-keys',
+    keyHint: '「API keys」→ Create new secret key',
+    modelMode: 'select',
+  },
+  volc: {
+    name: '火山引擎（豆包）',
+    baseUrl: 'https://ark.cn-beijing.volces.com/api/v3',
+    models: [],
+    keyLink: 'https://console.volcengine.com/ark',
+    keyHint: '「API Key管理」→ 创建；模型填推理接入点 ID（ep-xxx）',
+    modelMode: 'input',
+    modelPlaceholder: 'ep-20240101-xxxxxxxx',
+    modelLabel: '推理接入点 ID',
+  },
+  moonshot: {
+    name: 'Moonshot（Kimi）',
+    baseUrl: 'https://api.moonshot.cn/v1',
+    models: [
+      { id:'moonshot-v1-8k',   label:'moonshot-v1-8k（快速）' },
+      { id:'moonshot-v1-32k',  label:'moonshot-v1-32k（长文本）' },
+      { id:'moonshot-v1-128k', label:'moonshot-v1-128k（超长）' },
+    ],
+    keyLink: 'https://platform.moonshot.cn',
+    keyHint: '「API Keys」→ 新建',
+    modelMode: 'select',
+  },
+  yi: {
+    name: '零一万物',
+    baseUrl: 'https://api.lingyiwanwu.com/v1',
+    models: [
+      { id:'yi-lightning', label:'Yi-Lightning（推荐，快）' },
+      { id:'yi-large',     label:'Yi-Large' },
+      { id:'yi-medium',    label:'Yi-Medium' },
+    ],
+    keyLink: 'https://platform.lingyiwanwu.com',
+    keyHint: '「API Keys」→ 创建',
+    modelMode: 'select',
+  },
+  custom: {
+    name: '自定义',
+    baseUrl: '',
+    models: [],
+    keyLink: '',
+    keyHint: '填写自定义 Base URL 和模型名',
+    modelMode: 'input',
+    modelPlaceholder: '模型名称',
+    modelLabel: '模型名称',
+  },
+};
+
+// ── 提供商切换逻辑 ──
+function onProviderChange() {
+  const pkey = document.getElementById('cfg-provider').value;
+  const p = PROVIDERS[pkey];
+  if (!p) return;
+
+  // 模型区域
+  const fgSelect = document.getElementById('fg-model-select');
+  const fgInput  = document.getElementById('fg-model-input');
+  const sel      = document.getElementById('cfg-model-select');
+  const inp      = document.getElementById('cfg-model-input');
+  const lblInp   = document.getElementById('lbl-model-input');
+  const hintInp  = document.getElementById('hint-model-input');
+
+  if (p.modelMode === 'select' && p.models.length) {
+    fgSelect.style.display = '';
+    fgInput.style.display  = 'none';
+    sel.innerHTML = p.models.map(m=>`<option value="${m.id}">${m.label}</option>`).join('');
+    CFG.model = p.models[0].id;
+  } else {
+    fgSelect.style.display = 'none';
+    fgInput.style.display  = '';
+    lblInp.textContent = p.modelLabel || '模型名称';
+    inp.placeholder    = p.modelPlaceholder || '模型名称';
+    hintInp.textContent = p.modelMode === 'input' && pkey === 'volc'
+      ? '火山控制台 → 推理接入点 → 创建并复制 ID' : '';
+    CFG.model = inp.value || '';
+  }
+
+  // Base URL
+  const fgUrl = document.getElementById('fg-base-url');
+  if (pkey === 'custom') {
+    fgUrl.style.display = '';
+  } else {
+    fgUrl.style.display = 'none';
+    document.getElementById('cfg-base-url').value = p.baseUrl;
+    CFG.baseUrl = p.baseUrl;
+  }
+
+  // Key 提示
+  const linkEl = document.getElementById('link-api-key');
+  const hintEl = document.getElementById('hint-api-key');
+  if (p.keyLink) {
+    linkEl.href = p.keyLink;
+    linkEl.textContent = p.keyLink.replace('https://','');
+    hintEl.innerHTML = `→ <a id="link-api-key" href="${p.keyLink}" target="_blank">${p.keyLink.replace('https://','')}</a>　${p.keyHint}`;
+  } else {
+    hintEl.textContent = p.keyHint;
+  }
+
+  CFG.provider = pkey;
+}
+
+function onModelSelectChange() {
+  CFG.model = document.getElementById('cfg-model-select').value;
+}
+
+// ══════════════════════════════════
+//  AI 生成纪要（返回结构化 JSON）
+// ══════════════════════════════════
+async function generateMinutes(snap) {
+  const txText = snap.transcript.map(e=>`[${e.time}] ${e.speaker}：${e.text}`).join('\n');
+  const dur = `${Math.floor(snap.duration/60)}分${snap.duration%60}秒`;
+
+  if (!CFG.apiKey) return demoMinutes(snap, dur);
+
+  // ── 确定 base_url 和 model ──
+  const p = PROVIDERS[CFG.provider] || PROVIDERS.qwen;
+  const baseUrl = CFG.provider === 'custom'
+    ? (CFG.baseUrl || '').replace(/\/+$/, '')
+    : p.baseUrl;
+
+  // 火山/自定义：从输入框读模型
+  let model = CFG.model;
+  if (p.modelMode === 'input') {
+    model = document.getElementById('cfg-model-input')?.value?.trim() || CFG.model;
+  }
+  if (!model) throw new Error('请先填写模型名称 / 接入点 ID');
+  if (!baseUrl) throw new Error('请先填写 Base URL');
+
+  const detailMap = {
+    concise: '极度精简，每项只保留核心要点，行动事项不超过5条',
+    standard: '适中详细，覆盖主要内容，行动事项列出所有明确分工',
+    detailed: '尽量详细，保留重要细节和讨论背景'
+  };
+  const detailHint = detailMap[CFG.detail] || detailMap.standard;
+
+  const prompt = `你是专业会议纪要助手。请将会议内容整理为结构化 JSON 格式纪要。
+
+会议信息：
+- 会议室：${snap.room}
+- 开始时间：${snap.startAt}
+- 结束时间：${snap.endAt}
+- 时长：${dur}
+- 总记录条数：${snap.transcript.length}
+
+会议记录：
+${txText}
+
+详细程度要求：${detailHint}
+
+请严格按以下 JSON 格式返回，不要有任何其他内容：
+
+{
+  "summary": "2-3句话总结本次会议核心内容和结论",
+  "topics": [
+    { "title": "议题名称", "conclusion": "该议题的讨论结论或决定" }
+  ],
+  "actions": [
+    { "task": "具体任务描述", "owner": "负责人，不明确写待指定", "deadline": "截止时间，不明确写待定", "priority": "high|mid|low" }
+  ],
+  "followups": ["待跟进事项描述"]
+}
+
+要求：topics 最少1条最多8条；actions 只列明确分工的，没有则空数组；followups 列未确认或需后续跟进的；所有文字用中文。`;
+
+  const res = await fetch(`${baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${CFG.apiKey}` },
+    body: JSON.stringify({ model, messages:[{ role:'user', content:prompt }], max_tokens:2000 })
+  });
+
+  if (!res.ok) {
+    let errMsg = `API 错误 ${res.status}`;
+    try { const ed = await res.json(); errMsg += '：' + (ed.error?.message || JSON.stringify(ed)); } catch(e){}
+    throw new Error(errMsg);
+  }
+
+  const d = await res.json();
+  const raw = d.choices?.[0]?.message?.content || '';
+
+  // ── DeepSeek-Reasoner：剥离 <think> 推理链 ──
+  const cleaned = raw
+    .replace(/<think>[\s\S]*?<\/think>/g, '')
+    .replace(/```json\n?/g,'')
+    .replace(/```\n?/g,'')
+    .trim();
+
+  try {
+    return JSON.parse(cleaned);
+  } catch(e) {
+    return { _raw: raw };
+  }
+}
+
+// ══════════════════════════════════
+//  Demo 纪要（无 API Key 时）
+// ══════════════════════════════════
+function demoMinutes(snap, dur) {
+  return {
+    summary: `本次会议在 ${snap.room} 召开，时长 ${dur}，共记录 ${snap.transcript.length} 条发言。当前为示例模式，请在「配置」面板填写 API Key 以生成真实纪要。`,
+    topics: [
+      { title: '示例议题', conclusion: '与会人员就相关议题进行讨论并形成初步共识，明确了下一阶段工作方向。' }
+    ],
+    actions: [
+      { task: '整理本次会议要点并分发给相关人员', owner: '待指定', deadline: '今日内', priority: 'high' },
+      { task: '按讨论结论推进相关工作', owner: '待指定', deadline: '下次会议前', priority: 'mid' }
+    ],
+    followups: [
+      '请在「配置」面板选择模型提供商并填写对应 API Key，以生成基于真实内容的专业纪要'
+    ]
+  };
+}
+
+// ══════════════════════════════════
+//  渲染结构化纪要
+// ══════════════════════════════════
+function renderMinutes(data, snap) {
+  // 兼容旧版原始文本
+  if (typeof data === 'string' || (data && data._raw)) {
+    const raw = typeof data === 'string' ? data : data._raw;
+    document.getElementById('mbody').innerHTML = `<div style="font-size:13px;color:var(--txt);line-height:1.8;white-space:pre-wrap;font-family:var(--sans)">${escHtml(raw)}</div>`;
+    document.getElementById('raw-min').value = raw;
+    return;
+  }
+
+  const dur = snap ? `${Math.floor(snap.duration/60)}分${snap.duration%60}秒` : '';
+  const prioMap = { high:['prio-high','P0'], mid:['prio-mid','P1'], low:['prio-low','P2'] };
+
+  // 纯文本 for 复制
+  let plainText = `【SANI 会议纪要】\n会议室：${snap?.room||''}\n时间：${snap?.endAt||''}\n时长：${dur}\n\n`;
+  plainText += `【会议概要】\n${data.summary||''}\n\n`;
+  if(data.topics?.length) {
+    plainText += `【主要议题】\n`;
+    data.topics.forEach((t,i)=>{ plainText += `${i+1}. ${t.title}：${t.conclusion}\n`; });
+    plainText += '\n';
+  }
+  if(data.actions?.length) {
+    plainText += `【行动事项】\n`;
+    data.actions.forEach(a=>{ plainText += `- [${a.owner}] ${a.task}（截止：${a.deadline}）\n`; });
+    plainText += '\n';
+  }
+  if(data.followups?.length) {
+    plainText += `【待跟进】\n`;
+    data.followups.forEach(f=>{ plainText += `- ${f}\n`; });
+  }
+  document.getElementById('raw-min').value = plainText;
+
+  // HTML 渲染
+  let html = `<div class="min-wrap">`;
+
+  // 头部
+  html += `<div class="min-header">
+    <div class="min-header-title">📋 ${escHtml(snap?.room||'会议纪要')}</div>
+    <div class="mh-item"><div class="mh-label">时间</div><div class="mh-value">${escHtml(snap?.endAt||'')}</div></div>
+    <div class="mh-item"><div class="mh-label">时长 / 记录</div><div class="mh-value">${dur} · ${snap?.transcript?.length||0} 句</div></div>
+  </div>`;
+
+  // 概要
+  html += `<div class="min-section">
+    <div class="min-sec-head">
+      <div class="min-sec-icon icon-summary">💡</div>
+      <div class="min-sec-title">会议概要</div>
+    </div>
+    <div class="min-summary-text">${escHtml(data.summary||'暂无')}</div>
+  </div>`;
+
+  // 议题
+  if (data.topics?.length) {
+    const topicsHtml = data.topics.map(t=>`<div class="topic-item">
+      <div class="topic-title">${escHtml(t.title||'')}</div>
+      <div class="topic-conclusion">${escHtml(t.conclusion||'')}</div>
+    </div>`).join('');
+    html += `<div class="min-section">
+      <div class="min-sec-head">
+        <div class="min-sec-icon icon-topic">📌</div>
+        <div class="min-sec-title">主要议题 · ${data.topics.length} 项</div>
+      </div>
+      <div class="topic-list">${topicsHtml}</div>
+    </div>`;
+  }
+
+  // 行动事项
+  html += `<div class="min-section">
+    <div class="min-sec-head">
+      <div class="min-sec-icon icon-action">✅</div>
+      <div class="min-sec-title">行动事项 · ${data.actions?.length||0} 条</div>
+    </div>`;
+  if (data.actions?.length) {
+    html += `<table class="action-table">
+      <thead><tr>
+        <th style="width:44%">任务</th>
+        <th style="width:18%">负责人</th>
+        <th style="width:20%">截止时间</th>
+        <th style="width:18%">优先级</th>
+      </tr></thead>
+      <tbody>`;
+    data.actions.forEach(a=>{
+      const [cls,lbl] = prioMap[a.priority] || prioMap.mid;
+      html += `<tr>
+        <td>${escHtml(a.task||'')}</td>
+        <td class="td-owner">${escHtml(a.owner||'待指定')}</td>
+        <td class="td-ddl">${escHtml(a.deadline||'待定')}</td>
+        <td><span class="action-prio ${cls}">${lbl}</span></td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  } else {
+    html += `<div class="none-hint">暂无明确行动事项</div>`;
+  }
+  html += `</div>`;
+
+  // 待跟进
+  html += `<div class="min-section">
+    <div class="min-sec-head">
+      <div class="min-sec-icon icon-followup">🔍</div>
+      <div class="min-sec-title">待跟进事项 · ${data.followups?.length||0} 项</div>
+    </div>`;
+  if (data.followups?.length) {
+    html += `<div class="followup-list">` + data.followups.map(f=>`<div class="followup-item"><div class="followup-dot"></div><div class="followup-text">${escHtml(f)}</div></div>`).join('') + `</div>`;
+  } else {
+    html += `<div class="none-hint">暂无待跟进事项</div>`;
+  }
+  html += `</div>`;
+
+  html += `</div>`; // .min-wrap
+  document.getElementById('mbody').innerHTML = html;
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════
+//  查看纪要
+// ══════════════════════════════════
+function viewCurrent() {
+  if (currentMinutes) {
+    const records = loadRecords();
+    const rec = records.find(r=>r.id===lastRecordId);
+    openModal('当前会议纪要', currentMinutes, rec);
+  } else if (transcript.length) {
+    const snap = {room:CFG.room, duration:timerSec, endAt:new Date().toLocaleString('zh-CN'), transcript:[...transcript]};
+    openModal('纪要预览（示例）', demoMinutes(snap,`${Math.floor(timerSec/60)}分${timerSec%60}秒`), snap);
+  } else {
+    alert('暂无内容可查看');
+  }
+}
+
+function viewLastRecord() {
+  if (!lastRecordId) return;
+  const records = loadRecords();
+  const rec = records.find(r=>r.id===lastRecordId);
+  if (rec && rec.minutes) openModal(`${rec.room} · ${rec.endAt}`, rec.minutes, rec);
+}
+
+function viewRecord(id) {
+  const records = loadRecords();
+  const rec = records.find(r=>r.id===id);
+  if (!rec) return;
+  if (!rec.minutes) { alert('纪要生成中或失败，请稍后或重试'); return; }
+  openModal(`${rec.room} · ${rec.endAt}`, rec.minutes, rec);
+}
+
+function openModal(title, minutes, snap) {
+  document.getElementById('mtitle').textContent = title;
+  document.getElementById('mbadge').textContent = snap?.room || 'SANI';
+  _modalData = { minutes, snap };
+  renderMinutes(minutes, snap);
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() { document.getElementById('modal').style.display='none'; }
+
+function copyMin() {
+  const text = document.getElementById('raw-min').value;
+  navigator.clipboard.writeText(text).then(()=>{
+    const b=event.target; b.textContent='已复制 ✓';
+    setTimeout(()=>b.textContent='复制纯文本',1500);
+  });
+}
+
+// ══════════════════════════════════
+//  横幅
+// ══════════════════════════════════
+function showAsyncBanner(msg) {
+  document.getElementById('async-banner').classList.add('show');
+  document.getElementById('async-msg').textContent = msg;
+}
+function updateAsyncBanner(msg) { document.getElementById('async-msg').textContent=msg; }
+function hideAsyncBanner() { document.getElementById('async-banner').classList.remove('show'); }
+function showDoneBanner(msg) {
+  document.getElementById('done-banner').classList.add('show');
+  document.getElementById('done-msg').textContent = msg;
+}
+function hideDoneBanner() { document.getElementById('done-banner').classList.remove('show'); }
+
+// ══════════════════════════════════
+//  状态栏
+// ══════════════════════════════════
+function setStatus(t,c) {
+  const m={green:'var(--g)',amber:'var(--a)',blue:'var(--b)',red:'var(--r)'};
+  document.getElementById('pstatus').innerHTML=`<div class="pdot" style="background:${m[c]||m.green}"></div>${t}`;
+}
+
+// ══════════════════════════════════
+//  纪要本地存储
+// ══════════════════════════════════
+const REC_KEY='sani_records_v3';
+const MAX_RECORDS=30;
+
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(REC_KEY)||'[]'); } catch(e){ return []; }
+}
+
+function saveRecord(snap) {
+  let records = loadRecords();
+  const idx = records.findIndex(r=>r.id===snap.id);
+  if(idx>=0) records[idx]=snap;
+  else records.unshift(snap);
+  if(records.length>MAX_RECORDS) records=records.slice(0,MAX_RECORDS);
+  localStorage.setItem(REC_KEY, JSON.stringify(records));
+  renderRecords();
+  updateRecBadge(records);
+}
+
+function renderRecords() {
+  const records = loadRecords();
+  const el = document.getElementById('reclist');
+  if(!records.length){ el.innerHTML='<div class="empty-hint">暂无纪要</div>'; return; }
+
+  const sMap = {
+    ok:      {cls:'ok',      txt:'已完成'},
+    fail:    {cls:'fail',    txt:'生成失败'},
+    pending: {cls:'pending', txt:'生成中'}
+  };
+
+  el.innerHTML = records.map(r=>{
+    const s = sMap[r.status]||sMap.pending;
+    const dur = r.duration ? `${Math.floor(r.duration/60)}分${r.duration%60}秒` : '—';
+    return `<div class="recitem" onclick="viewRecord(${r.id})">
+      <div class="rechead">
+        <span class="recroom">${r.room}</span>
+        <span class="rectime">${(r.endAt||'').split(' ')[1]||r.endAt||''}</span>
+      </div>
+      <div class="recmeta">${r.endAt?.split(' ')[0]||''} · ${dur} · ${r.transcript?.length||0}句</div>
+      <div style="display:flex;align-items:center">
+        <span class="recstatus ${s.cls}">${s.txt}</span>
+        ${r.status==='fail'?`<button class="recbtn" onclick="event.stopPropagation();retryRecord(${r.id})" style="color:var(--a);border-color:rgba(245,166,35,.4)">重试</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateRecBadge(records) {
+  const pending = records.filter(r=>r.status==='pending').length;
+  const badge = document.getElementById('rec-badge');
+  if(pending) badge.textContent=`⏳${pending}`;
+  else badge.textContent='';
+}
+
+async function retryRecord(id) {
+  const records = loadRecords();
+  const snap = records.find(r=>r.id===id);
+  if(!snap) return;
+  snap.status='pending'; snap.error='';
+  saveRecord(snap);
+  showAsyncBanner(`正在重新生成：${snap.room} 纪要...`);
+  try {
+    snap.minutes = await generateMinutes(snap);
+    snap.status = 'ok';
+    if(id===lastRecordId) currentMinutes = snap.minutes;
+    showDoneBanner(`${snap.room} 纪要重新生成完成`);
+  } catch(err) {
+    snap.status='fail'; snap.error=err.message;
+  }
+  saveRecord(snap);
+  hideAsyncBanner();
+}
+
+function clearRecords() {
+  if(!confirm('确认清空所有历史纪要？')) return;
+  localStorage.removeItem(REC_KEY);
+  renderRecords();
+  document.getElementById('rec-badge').textContent='';
+}
+
+// ══════════════════════════════════
+//  导出 Word 文档
+// ══════════════════════════════════
+async function exportToWord() {
+  if (!_modalData) return;
+  const btn = document.getElementById('btn-export-word');
+  btn.disabled = true; btn.textContent = '加载库中...';
+
+  // 等待 docx.js 加载完成（最多 12 秒）
+  await new Promise((resolve, reject) => {
+    if (window._docxReady) return resolve();
+    if (window._docxError) return reject(new Error('docx.js 加载失败，请检查网络后刷新重试'));
+    let waited = 0;
+    const t = setInterval(() => {
+      waited += 100;
+      if (window._docxReady) { clearInterval(t); resolve(); }
+      else if (window._docxError || waited > 12000) {
+        clearInterval(t);
+        reject(new Error('docx.js 加载超时，请检查网络后刷新重试'));
+      }
+    }, 100);
+  });
+
+  const { minutes: data, snap } = _modalData;
+  btn.textContent = '生成中...';
+
+  try {
+    if (typeof data === 'string' || (data && data._raw)) {
+      const raw = typeof data === 'string' ? data : data._raw;
+      await exportWordRaw(raw, snap);
+      return;
+    }
+    await exportWordStructured(data, snap);
+  } catch(e) {
+    alert('导出失败：' + e.message);
+    console.error(e);
+  } finally {
+    btn.disabled = false; btn.textContent = '⬇ 导出 Word';
+  }
+}
+
+async function exportWordStructured(data, snap) {
+  const docxLib = window.docx;
+  if (!docxLib) throw new Error('docx 库未加载，请刷新重试');
+  const {
+    Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+    AlignmentType, HeadingLevel, BorderStyle, WidthType, ShadingType,
+    VerticalAlign, LevelFormat, Header, Footer, PageNumber,
+    TabStopType, TabStopPosition
+  } = docxLib;
+
+  const dur = snap ? `${Math.floor(snap.duration/60)}分${snap.duration%60}秒` : '';
+  const room = snap?.room || 'SANI';
+  const endAt = snap?.endAt || new Date().toLocaleString('zh-CN');
+  const sentences = snap?.transcript?.length || 0;
+
+  // ── 颜色常量 ──
+  const C_GREEN  = '00C47D';
+  const C_GREEN_L= 'E6F9F3';
+  const C_BLUE   = '4D9DE0';
+  const C_BLUE_L = 'EBF4FC';
+  const C_PURPLE = '9B8CE8';
+  const C_PURPLE_L='F0EEF9';
+  const C_AMBER  = 'F5A623';
+  const C_AMBER_L= 'FEF6E8';
+  const C_RED    = 'E53E3E';
+  const C_RED_L  = 'FEF0F0';
+  const C_GRAY_H = 'F4F6F8';
+  const C_GRAY_BD= 'DDE3EC';
+  const C_TXT    = '2D3748';
+  const C_TXT_M  = '64748B';
+  const C_WHITE  = 'FFFFFF';
+  const C_HEADER_BG = '0A0C10';
+
+  // ── 边框辅助 ──
+  const border1 = (color) => ({ style: BorderStyle.SINGLE, size: 1, color: color || C_GRAY_BD });
+  const noBorder = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+  const allBorders = (color) => ({ top:border1(color), bottom:border1(color), left:border1(color), right:border1(color) });
+  const noBorders = { top:noBorder, bottom:noBorder, left:noBorder, right:noBorder };
+
+  const PAGE_W = 11906; // A4
+  const MARGIN = 1200;
+  const CONTENT_W = PAGE_W - MARGIN * 2; // 9506 DXA
+
+  // ── 段落间距辅助 ──
+  const sp = (before=0, after=0) => ({ spacing: { before, after } });
+
+  // ── 节标题段落 ──
+  function sectionHeader(icon, title, bgColor, textColor) {
+    return new Paragraph({
+      ...sp(240, 120),
+      shading: { fill: bgColor, type: ShadingType.CLEAR },
+      border: { left: { style: BorderStyle.SINGLE, size: 18, color: textColor } },
+      indent: { left: 180, right: 0 },
+      children: [
+        new TextRun({ text: `${icon}  ${title}`, bold: true, size: 24, color: textColor, font: 'Microsoft YaHei' }),
+      ]
+    });
+  }
+
+  // ── 分隔空段 ──
+  const blank = (n=1) => Array.from({length:n}, ()=> new Paragraph({ ...sp(0,0), children:[new TextRun('')] }));
+
+  const children = [];
+
+  // ════════════════════════════════
+  //  ① 封面头部信息块
+  // ════════════════════════════════
+  // 顶部色条
+  children.push(new Paragraph({
+    ...sp(0, 0),
+    shading: { fill: C_HEADER_BG, type: ShadingType.CLEAR },
+    border: { bottom: { style: BorderStyle.SINGLE, size: 24, color: C_GREEN } },
+    children: [
+      new TextRun({ text: '  SANI 会议助手', bold: true, size: 32, color: C_WHITE, font: 'Microsoft YaHei' }),
+      new TextRun({ text: '  ·  ', size: 24, color: '888888' }),
+      new TextRun({ text: '会议纪要', size: 26, color: 'AAAAAA', font: 'Microsoft YaHei' }),
+    ]
+  }));
+
+  // 信息卡（四格）
+  const infoTableRows = [
+    ['会议室', room, '时长', dur],
+    ['时间', endAt, '记录条数', `${sentences} 句`],
+  ];
+  const colW = [CONTENT_W*0.18, CONTENT_W*0.32, CONTENT_W*0.18, CONTENT_W*0.32].map(Math.round);
+
+  const infoRows = infoTableRows.map(row =>
+    new TableRow({
+      children: [
+        new TableCell({ borders: noBorders, width:{size:colW[0],type:WidthType.DXA}, shading:{fill:C_GRAY_H,type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:160,right:80},
+          children:[new Paragraph({children:[new TextRun({text:row[0], bold:true, size:18, color:C_TXT_M, font:'Microsoft YaHei'})]})] }),
+        new TableCell({ borders: noBorders, width:{size:colW[1],type:WidthType.DXA}, shading:{fill:C_WHITE,type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:120,right:80},
+          children:[new Paragraph({children:[new TextRun({text:row[1], size:20, color:C_TXT, font:'Microsoft YaHei'})]})] }),
+        new TableCell({ borders: noBorders, width:{size:colW[2],type:WidthType.DXA}, shading:{fill:C_GRAY_H,type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:160,right:80},
+          children:[new Paragraph({children:[new TextRun({text:row[2], bold:true, size:18, color:C_TXT_M, font:'Microsoft YaHei'})]})] }),
+        new TableCell({ borders: noBorders, width:{size:colW[3],type:WidthType.DXA}, shading:{fill:C_WHITE,type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:120,right:80},
+          children:[new Paragraph({children:[new TextRun({text:row[3], size:20, color:C_TXT, font:'Microsoft YaHei'})]})] }),
+      ]
+    })
+  );
+
+  children.push(new Table({
+    width: { size: CONTENT_W, type: WidthType.DXA },
+    columnWidths: colW,
+    borders: { top:border1(C_GRAY_BD), bottom:border1(C_GRAY_BD), left:border1(C_GRAY_BD), right:border1(C_GRAY_BD), insideH:border1(C_GRAY_BD), insideV:border1(C_GRAY_BD) },
+    rows: infoRows,
+  }));
+
+  // ════════════════════════════════
+  //  ② 会议概要
+  // ════════════════════════════════
+  children.push(...blank(1));
+  children.push(sectionHeader('💡', '会议概要', C_BLUE_L, C_BLUE));
+  children.push(new Paragraph({
+    ...sp(80, 80),
+    indent: { left: 200 },
+    children: [new TextRun({ text: data.summary || '暂无', size: 22, color: C_TXT, font: 'Microsoft YaHei' })]
+  }));
+
+  // ════════════════════════════════
+  //  ③ 主要议题
+  // ════════════════════════════════
+  if (data.topics?.length) {
+    children.push(...blank(1));
+    children.push(sectionHeader('📌', `主要议题  ·  ${data.topics.length} 项`, C_PURPLE_L, C_PURPLE));
+    data.topics.forEach((t, i) => {
+      children.push(new Paragraph({
+        ...sp(100, 20),
+        indent: { left: 200 },
+        border: { left: { style: BorderStyle.SINGLE, size: 12, color: C_PURPLE } },
+        shading: { fill: C_PURPLE_L, type: ShadingType.CLEAR },
+        children: [new TextRun({ text: `${i+1}.  ${t.title || ''}`, bold: true, size: 22, color: C_PURPLE, font: 'Microsoft YaHei' })]
+      }));
+      children.push(new Paragraph({
+        ...sp(40, 80),
+        indent: { left: 320 },
+        children: [new TextRun({ text: t.conclusion || '', size: 20, color: C_TXT, font: 'Microsoft YaHei' })]
+      }));
+    });
+  }
+
+  // ════════════════════════════════
+  //  ④ 行动事项（带颜色表格）
+  // ════════════════════════════════
+  children.push(...blank(1));
+  children.push(sectionHeader('✅', `行动事项  ·  ${data.actions?.length||0} 条`, C_GREEN_L, C_GREEN));
+
+  if (data.actions?.length) {
+    // 表头
+    const aColW = [
+      Math.round(CONTENT_W*0.42),
+      Math.round(CONTENT_W*0.18),
+      Math.round(CONTENT_W*0.22),
+      Math.round(CONTENT_W*0.18),
+    ];
+    const thCell = (txt, w) => new TableCell({
+      width:{size:w,type:WidthType.DXA},
+      shading:{fill:C_GREEN,type:ShadingType.CLEAR},
+      borders: allBorders(C_GREEN),
+      margins:{top:80,bottom:80,left:120,right:80},
+      verticalAlign: VerticalAlign.CENTER,
+      children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:txt,bold:true,size:19,color:C_WHITE,font:'Microsoft YaHei'})]})]
+    });
+
+    const prioStyle = {
+      high: { bg: C_RED_L,   txt: C_RED,    label: 'P0 紧急' },
+      mid:  { bg: C_AMBER_L, txt: C_AMBER,  label: 'P1 重要' },
+      low:  { bg: C_GRAY_H,  txt: C_TXT_M,  label: 'P2 普通' },
+    };
+
+    const actionRows = [
+      new TableRow({ tableHeader: true, children: [
+        thCell('任务内容', aColW[0]),
+        thCell('负责人', aColW[1]),
+        thCell('截止时间', aColW[2]),
+        thCell('优先级', aColW[3]),
+      ]}),
+      ...data.actions.map((a, idx) => {
+        const ps = prioStyle[a.priority] || prioStyle.mid;
+        const rowBg = idx % 2 === 0 ? C_WHITE : C_GRAY_H;
+        const tdBorder = allBorders(C_GRAY_BD);
+        const tdM = {top:80,bottom:80,left:120,right:80};
+        return new TableRow({ children: [
+          new TableCell({ borders:tdBorder, width:{size:aColW[0],type:WidthType.DXA}, shading:{fill:rowBg,type:ShadingType.CLEAR}, margins:tdM, verticalAlign:VerticalAlign.CENTER,
+            children:[new Paragraph({children:[new TextRun({text:a.task||'',size:20,color:C_TXT,font:'Microsoft YaHei'})]})] }),
+          new TableCell({ borders:tdBorder, width:{size:aColW[1],type:WidthType.DXA}, shading:{fill:rowBg,type:ShadingType.CLEAR}, margins:tdM, verticalAlign:VerticalAlign.CENTER,
+            children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:a.owner||'待指定',bold:true,size:20,color:C_GREEN,font:'Microsoft YaHei'})]})] }),
+          new TableCell({ borders:tdBorder, width:{size:aColW[2],type:WidthType.DXA}, shading:{fill:rowBg,type:ShadingType.CLEAR}, margins:tdM, verticalAlign:VerticalAlign.CENTER,
+            children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:a.deadline||'待定',size:20,color:C_AMBER,font:'Microsoft YaHei'})]})] }),
+          new TableCell({ borders:tdBorder, width:{size:aColW[3],type:WidthType.DXA}, shading:{fill:ps.bg,type:ShadingType.CLEAR}, margins:tdM, verticalAlign:VerticalAlign.CENTER,
+            children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:ps.label,bold:true,size:18,color:ps.txt,font:'Microsoft YaHei'})]})] }),
+        ]});
+      })
+    ];
+
+    children.push(new Table({
+      width:{size:CONTENT_W,type:WidthType.DXA},
+      columnWidths: aColW,
+      rows: actionRows,
+    }));
+  } else {
+    children.push(new Paragraph({ ...sp(60,60), indent:{left:200},
+      children:[new TextRun({text:'暂无明确行动事项',size:20,color:C_TXT_M,font:'Microsoft YaHei',italics:true})]
+    }));
+  }
+
+  // ════════════════════════════════
+  //  ⑤ 待跟进事项
+  // ════════════════════════════════
+  children.push(...blank(1));
+  children.push(sectionHeader('🔍', `待跟进事项  ·  ${data.followups?.length||0} 项`, C_AMBER_L, C_AMBER));
+
+  if (data.followups?.length) {
+    data.followups.forEach(f => {
+      children.push(new Paragraph({
+        ...sp(80, 40),
+        indent: { left: 200, hanging: 200 },
+        shading: { fill: C_AMBER_L, type: ShadingType.CLEAR },
+        border: { left: { style: BorderStyle.SINGLE, size: 12, color: C_AMBER } },
+        children: [
+          new TextRun({ text: '▸  ', bold: true, size: 20, color: C_AMBER }),
+          new TextRun({ text: f, size: 20, color: C_TXT, font: 'Microsoft YaHei' })
+        ]
+      }));
+    });
+  } else {
+    children.push(new Paragraph({ ...sp(60,60), indent:{left:200},
+      children:[new TextRun({text:'暂无待跟进事项',size:20,color:C_TXT_M,font:'Microsoft YaHei',italics:true})]
+    }));
+  }
+
+  // ════════════════════════════════
+  //  ⑥ 页脚分隔 + 生成标注
+  // ════════════════════════════════
+  children.push(...blank(2));
+  children.push(new Paragraph({
+    ...sp(0,0),
+    border: { top: { style: BorderStyle.SINGLE, size: 4, color: C_GRAY_BD } },
+    children: []
+  }));
+  children.push(new Paragraph({
+    ...sp(80,0),
+    alignment: AlignmentType.RIGHT,
+    children: [
+      new TextRun({ text: `由 SANI 会议助手自动生成  ·  ${endAt}`, size: 16, color: C_TXT_M, font: 'Microsoft YaHei', italics: true })
+    ]
+  }));
+
+  // ════════════════════════════════
+  //  构建文档
+  // ════════════════════════════════
+  const doc = new Document({
+    styles: {
+      default: {
+        document: { run: { font: 'Microsoft YaHei', size: 22, color: C_TXT } }
+      }
+    },
+    sections: [{
+      properties: {
+        page: {
+          size: { width: PAGE_W, height: 16838 },
+          margin: { top: MARGIN, right: MARGIN, bottom: MARGIN, left: MARGIN }
+        }
+      },
+      headers: {
+        default: new Header({ children: [
+          new Paragraph({
+            tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+            shading: { fill: C_HEADER_BG, type: ShadingType.CLEAR },
+            children: [
+              new TextRun({ text: 'SANI 会议助手', bold: true, size: 18, color: C_GREEN, font: 'Microsoft YaHei' }),
+              new TextRun({ text: `\t${room}  ·  ${endAt}`, size: 16, color: '888888', font: 'Microsoft YaHei' }),
+            ]
+          })
+        ]})
+      },
+      footers: {
+        default: new Footer({ children: [
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun({ text: '第 ', size: 16, color: C_TXT_M }),
+              new TextRun({ children: [PageNumber.CURRENT], size: 16, color: C_TXT_M }),
+              new TextRun({ text: ' 页  |  SANI 会议纪要', size: 16, color: C_TXT_M, font: 'Microsoft YaHei' }),
+            ]
+          })
+        ]})
+      },
+      children,
+    }]
+  });
+
+  const buf = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(buf);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `SANI_会议纪要_${room}_${endAt?.replace(/[/:]/g,'-').replace(/\s/g,'_')||'导出'}.docx`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// 纯文本降级导出
+async function exportWordRaw(raw, snap) {
+  const docxLib = window.docx;
+  if (!docxLib) throw new Error('docx 库未加载，请刷新重试');
+  const { Document, Packer, Paragraph, TextRun, AlignmentType, Header, Footer, PageNumber, ShadingType, TabStopType, TabStopPosition } = docxLib;
+  const endAt = snap?.endAt || new Date().toLocaleString('zh-CN');
+  const room = snap?.room || 'SANI';
+  const lines = raw.split('\n').map(line =>
+    new Paragraph({ children: [new TextRun({ text: line, size: 22, font: 'Microsoft YaHei', color:'2D3748' })] })
+  );
+  const doc = new Document({
+    sections: [{
+      properties: { page: { size:{width:11906,height:16838}, margin:{top:1200,right:1200,bottom:1200,left:1200} } },
+      headers: { default: new Header({ children: [new Paragraph({ tabStops:[{type:TabStopType.RIGHT,position:TabStopPosition.MAX}], children:[new TextRun({text:'SANI 会议纪要',bold:true,size:18,color:'00C47D',font:'Microsoft YaHei'}),new TextRun({text:`\t${room}`,size:16,color:'888888',font:'Microsoft YaHei'})] })] }) },
+      footers: { default: new Footer({ children: [new Paragraph({ alignment:AlignmentType.CENTER, children:[new TextRun({text:'第 ',size:16,color:'64748B'}),new TextRun({children:[PageNumber.CURRENT],size:16,color:'64748B'}),new TextRun({text:' 页',size:16,color:'64748B'})] })] }) },
+      children: lines,
+    }]
+  });
+  const buf = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(buf);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `SANI_会议纪要_${room}.docx`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+
+function stab(id,el) {
+  document.querySelectorAll('.sp').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('sp-'+id).classList.add('on');
+  el.classList.add('on');
+}
+
+// ══════════════════════════════════
+//  配置
+// ══════════════════════════════════
+function saveConfig() {
+  CFG.room     = document.getElementById('cfg-room').value.trim()    || CFG.room;
+  CFG.speaker  = document.getElementById('cfg-speaker').value.trim() || CFG.speaker;
+  CFG.apiKey   = document.getElementById('cfg-api').value.trim()     || CFG.apiKey;
+  CFG.detail   = document.getElementById('cfg-detail').value         || CFG.detail;
+  CFG.provider = document.getElementById('cfg-provider').value       || CFG.provider;
+  CFG.baseUrl  = document.getElementById('cfg-base-url').value.trim()|| CFG.baseUrl;
+
+  // 模型：下拉 or 手填
+  const p = PROVIDERS[CFG.provider] || PROVIDERS.qwen;
+  if (p.modelMode === 'input') {
+    CFG.model = document.getElementById('cfg-model-input').value.trim() || CFG.model;
+  } else {
+    CFG.model = document.getElementById('cfg-model-select').value || CFG.model;
+  }
+
+  document.getElementById('room-label').textContent = '/ '+CFG.room;
+  localStorage.setItem('sani_cfg_v3', JSON.stringify(CFG));
+  const b=event.target; b.textContent='已保存 ✓';
+  setTimeout(()=>b.textContent='保存配置',1500);
+}
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+// ── 初始化 ──
+(function init(){
+  try {
+    const s = JSON.parse(localStorage.getItem('sani_cfg_v3')||'{}');
+    Object.assign(CFG, s);
+    if(s.room)     { document.getElementById('cfg-room').value=s.room; document.getElementById('room-label').textContent='/ '+s.room; }
+    if(s.speaker)    document.getElementById('cfg-speaker').value=s.speaker;
+    if(s.apiKey)     document.getElementById('cfg-api').value=s.apiKey;
+    if(s.detail)     document.getElementById('cfg-detail').value=s.detail;
+
+    // 恢复提供商 & 模型
+    if(s.provider) {
+      document.getElementById('cfg-provider').value = s.provider;
+      onProviderChange(); // 刷新 UI
+      const p = PROVIDERS[s.provider] || PROVIDERS.qwen;
+      if(s.model) {
+        if(p.modelMode === 'input') {
+          document.getElementById('cfg-model-input').value = s.model;
+        } else {
+          const sel = document.getElementById('cfg-model-select');
+          // 如果选项里有就选，否则忽略（保留第一个）
+          const opt = [...sel.options].find(o=>o.value===s.model);
+          if(opt) sel.value = s.model;
+        }
+      }
+    } else {
+      onProviderChange(); // 初始化默认提供商 UI
+    }
+    if(s.baseUrl) document.getElementById('cfg-base-url').value = s.baseUrl;
+  } catch(e){ onProviderChange(); }
+  renderRecords();
+  updateRecBadge(loadRecords());
+})();
+</script>
+
+<!--
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SANI 会议助手 v3.1 · 部署指南
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【改版说明】
+  ✓ 去掉企微推送，结束会议后异步生成纪要
+  ✓ 纪要采用结构化模板（JSON → 可视化卡片）
+  ✓ 新增「导出 Word」—— 浏览器直接生成带色彩/表格/页眉页脚的 .docx
+    - 封面信息块（会议室、时长、时间）
+    - 会议概要（蓝色左边框卡片）
+    - 主要议题（紫色分组，结论缩进）
+    - 行动事项（全彩表格：绿色负责人/橙色截止/P0-P2优先级色标）
+    - 待跟进（橙色左边框列表）
+    - 页眉（深色横幅+会议信息）/ 页脚（居中页码）
+  ✓ 保留「复制纯文本」功能
+  ✓ 支持纪要详细程度调节（简洁/标准/详细）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  发布途径（推荐，无需部署）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+方案一：GitHub Pages（最推荐）
+  1. 注册/登录 github.com
+  2. 新建 public 仓库，如 sani-meeting
+  3. 上传此 HTML 文件，改名为 index.html
+  4. Settings → Pages → Source 选 main 分支
+  5. 访问地址：https://你的用户名.github.io/sani-meeting
+  6. 企微工作台添加该链接即可内部访问
+
+方案二：Cloudflare Pages（国内更快）
+  1. 登录 dash.cloudflare.com
+  2. Workers & Pages → Create → Pages → Upload
+  3. 上传此 HTML 文件（压缩成 zip）
+  4. 获得 xxx.pages.dev 域名，国内访问流畅
+
+方案三：企微工作台内嵌（体验最好）
+  完成方案一/二后：
+  企微管理后台 → 工作台 → 应用管理 → 添加第三方应用
+  → 自定义应用 → 填入上方 URL → 员工直接从工作台打开
+
+【使用方式】
+  Chrome/Edge 打开页面 → 配置 API Key → 开始会议
+
+【API Key 获取】
+  dashscope.aliyun.com → API-KEY管理 → 创建新密钥
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-->
+</body>
+</html>
