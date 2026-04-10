@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SANI 会议助手 v3</title>
+<title>SANI 会议助手 v5</title>
 <script>
 // ── docx.js 动态加载（多源降级）──
 window._docxReady = false;
@@ -176,54 +176,34 @@ window._docxError = false;
   .bigspin{width:18px;height:18px;border:2px solid var(--bd2);border-top-color:var(--gl);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 
   /* ══════════════════════════════════
-     纪要模板样式
+     纪要 — 简洁商务样式
   ══════════════════════════════════ */
-  .min-wrap{display:flex;flex-direction:column;gap:14px}
-
-  /* 头部信息卡 */
-  .min-header{background:linear-gradient(135deg,rgba(0,196,125,.07),rgba(0,196,125,.02));border:1px solid rgba(0,196,125,.2);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .min-header-title{grid-column:1/-1;font-size:15px;font-weight:700;color:var(--gl);margin-bottom:4px;letter-spacing:.03em}
-  .mh-item{display:flex;flex-direction:column;gap:2px}
-  .mh-label{font-size:9px;font-weight:600;color:var(--td);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)}
-  .mh-value{font-size:12px;color:var(--txt);font-family:var(--mono);font-weight:500}
-
-  /* 概要卡 */
-  .min-section{background:var(--sur2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px}
-  .min-sec-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-  .min-sec-icon{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
-  .icon-summary{background:rgba(77,157,224,.15);color:var(--b)}
-  .icon-topic{background:rgba(155,140,232,.15);color:var(--p)}
-  .icon-action{background:rgba(0,196,125,.15);color:var(--gl)}
-  .icon-followup{background:rgba(245,166,35,.15);color:var(--a)}
-  .min-sec-title{font-size:11px;font-weight:600;color:var(--txt);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)}
-  .min-summary-text{font-size:13px;color:rgba(255,255,255,.72);line-height:1.75}
-
-  /* 议题列表 */
-  .topic-list{display:flex;flex-direction:column;gap:8px}
-  .topic-item{border-left:2px solid var(--p);padding:8px 12px;background:rgba(155,140,232,.04);border-radius:0 5px 5px 0}
-  .topic-title{font-size:12px;font-weight:600;color:var(--p);margin-bottom:3px}
-  .topic-conclusion{font-size:12px;color:rgba(255,255,255,.65);line-height:1.6}
-
-  /* 行动事项表格 */
-  .action-table{width:100%;border-collapse:collapse}
-  .action-table th{font-size:9px;font-weight:600;color:var(--td);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);text-align:left;padding:5px 8px;border-bottom:1px solid var(--bd);background:rgba(0,196,125,.04)}
-  .action-table td{font-size:12px;padding:8px;border-bottom:1px solid var(--bd);vertical-align:top;color:rgba(255,255,255,.72);line-height:1.5}
-  .action-table tr:last-child td{border-bottom:none}
-  .action-table .td-owner{color:var(--gl);font-weight:600;font-family:var(--mono);font-size:11px;white-space:nowrap}
-  .action-table .td-ddl{color:var(--a);font-family:var(--mono);font-size:11px;white-space:nowrap}
-  .action-prio{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;font-family:var(--mono);letter-spacing:.04em;margin-right:4px}
-  .prio-high{background:var(--rb);color:var(--r)}
-  .prio-mid{background:var(--ab);color:var(--a)}
-  .prio-low{background:var(--sur);color:var(--tm)}
-
-  /* 跟进事项 */
-  .followup-list{display:flex;flex-direction:column;gap:6px}
-  .followup-item{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.12);border-radius:5px}
-  .followup-dot{width:5px;height:5px;border-radius:50%;background:var(--a);flex-shrink:0;margin-top:5px}
-  .followup-text{font-size:12px;color:rgba(255,255,255,.65);line-height:1.6}
-
-  /* 无内容占位 */
-  .none-hint{font-size:12px;color:var(--td);font-family:var(--mono);padding:6px 0}
+  .ms-wrap{display:flex;flex-direction:column;gap:0;font-family:var(--sans)}
+  .ms-quality{font-size:11px;padding:6px 12px;border-radius:var(--rs);margin-bottom:10px;font-family:var(--mono)}
+  .ms-q-mid{background:var(--ab);color:var(--a)}
+  .ms-q-low{background:var(--rb);color:var(--r)}
+  .ms-header{padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--bd2)}
+  .ms-title{font-size:16px;font-weight:700;color:var(--txt);margin-bottom:4px}
+  .ms-meta{font-size:11px;color:var(--tm);font-family:var(--mono)}
+  .ms-sec-head{font-size:13px;font-weight:700;color:var(--txt);margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--bd)}
+  .ms-para{font-size:13px;color:rgba(255,255,255,.72);line-height:1.75;padding-left:4px}
+  .ms-topic{margin-bottom:12px;padding-left:4px}
+  .ms-topic-title{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px}
+  .ms-topic-detail{font-size:12px;color:rgba(255,255,255,.62);line-height:1.7;margin-bottom:5px;padding-left:12px}
+  .ms-kp{margin:4px 0 6px 24px;padding:0}
+  .ms-kp li{font-size:11px;color:var(--tm);line-height:1.7;list-style:disc}
+  .ms-conclusion{font-size:12px;padding-left:12px;color:rgba(255,255,255,.72);display:flex;align-items:flex-start;gap:7px}
+  .ms-c-label{font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:var(--sur3);color:var(--gl);flex-shrink:0;margin-top:2px;font-family:var(--mono)}
+  .ms-decision{font-size:13px;color:rgba(255,255,255,.72);line-height:1.7;padding-left:4px;margin-bottom:4px}
+  .ms-basis{font-size:11px;color:var(--tm)}
+  .ms-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:2px}
+  .ms-table th{text-align:left;padding:6px 8px;font-size:10px;font-weight:600;color:var(--tm);border-bottom:1px solid var(--bd2);text-transform:uppercase;letter-spacing:.04em;font-family:var(--mono)}
+  .ms-table td{padding:7px 8px;border-bottom:1px solid var(--bd);color:rgba(255,255,255,.68);vertical-align:top}
+  .ms-table tr:last-child td{border-bottom:none}
+  .ms-table td:nth-child(2){color:var(--gl);font-weight:600}
+  .ms-table td:nth-child(3){color:var(--a);font-family:var(--mono);font-size:11px}
+  .ms-list{margin:4px 0 0 16px;padding:0;display:flex;flex-direction:column;gap:5px}
+  .ms-list li{font-size:12px;color:rgba(255,255,255,.65);line-height:1.7;list-style:disc}
 </style>
 </head>
 <body>
@@ -234,7 +214,7 @@ window._docxError = false;
   <div class="logo">
     <div class="lmark">S</div>
     <span class="lname">SANI 会议助手</span>
-    <span class="lroom" id="room-label">/ 会议室 A</span>
+    <span class="lroom" id="room-label">/ 会议名称</span>
   </div>
   <div class="topright">
     <div class="timerbox" id="timer">00:00:00</div>
@@ -323,10 +303,34 @@ window._docxError = false;
 
       <!-- API Key -->
       <div class="fg">
-        <div class="fl">API Key</div>
+        <div class="fl">纪要生成 API Key</div>
         <input class="fi" id="cfg-api" type="password" placeholder="sk-xxxxxxxxxxxxxxxx">
         <div class="fhint" id="hint-api-key">
           → <a id="link-api-key" href="https://dashscope.aliyun.com" target="_blank">dashscope.aliyun.com</a> 「API-KEY管理」创建
+        </div>
+      </div>
+
+      <!-- 讯飞 ASR -->
+      <div class="fg">
+        <div class="fl">语音识别</div>
+        <select class="fi" id="cfg-asr" onchange="onAsrChange()" style="cursor:pointer">
+          <option value="xf">科大讯飞（优先，高准确率）</option>
+          <option value="browser">浏览器内置（免费降级）</option>
+        </select>
+      </div>
+      <div id="fg-xf" style="">
+        <div class="fg">
+          <div class="fl">讯飞 APPID</div>
+          <input class="fi" id="cfg-xf-appid" placeholder="xxxxxxxx">
+        </div>
+        <div class="fg">
+          <div class="fl">讯飞 APIKey</div>
+          <input class="fi" id="cfg-xf-apikey" type="password" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+        </div>
+        <div class="fg">
+          <div class="fl">讯飞 APISecret</div>
+          <input class="fi" id="cfg-xf-apisecret" type="password" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+          <div class="fhint">→ <a href="https://console.xfyun.cn/services/iat" target="_blank">console.xfyun.cn</a> 「实时语音转写」获取</div>
         </div>
       </div>
 
@@ -393,10 +397,20 @@ window._docxError = false;
     </div>
     <div class="mbody"><div id="mbody"></div></div>
     <div class="mfoot">
+      <button class="btn" onclick="toggleTranscript()" id="btn-transcript" style="display:none">查看原始转录</button>
       <button class="btn" onclick="copyMin()">复制纯文本</button>
       <button class="btn accent" id="btn-export-word" onclick="exportToWord()">⬇ 导出 Word</button>
       <button class="btn primary" onclick="closeModal()">关闭</button>
     </div>
+  </div>
+</div>
+<div id="transcript-panel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;padding:20px;overflow-y:auto">
+  <div style="max-width:700px;margin:0 auto;background:var(--sur);border-radius:12px;padding:20px;border:1px solid var(--bd2)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span style="font-size:14px;font-weight:600">原始语音识别记录</span>
+      <button onclick="document.getElementById('transcript-panel').style.display='none'" style="background:var(--sur2);border:1px solid var(--bd);color:var(--tm);border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px">✕</button>
+    </div>
+    <div id="transcript-content" style="font-size:12px;color:rgba(255,255,255,.65);line-height:2;font-family:var(--mono)"></div>
   </div>
 </div>
 <textarea id="raw-min" style="display:none"></textarea>
@@ -406,13 +420,17 @@ window._docxError = false;
 //  配置
 // ══════════════════════════════════
 let CFG = {
-  room: '会议室 A',
+  room: '会议名称',
   speaker: '发言人',
   apiKey: '',
   detail: 'standard',
-  provider: 'qwen',       // 提供商 key
-  model: 'qwen-plus',     // 当前模型
-  baseUrl: '',            // 自定义 base url（仅 custom 模式）
+  provider: 'qwen',
+  model: 'qwen-plus',
+  baseUrl: '',
+  asr: 'xf',
+  xfAppId: '',
+  xfApiKey: '',
+  xfApiSecret: '',
 };
 
 // ══════════════════════════════════
@@ -432,47 +450,177 @@ const ACT=['负责','跟进','确认','安排','完成','提交','汇报','整�
 const HOT=['问题','目标','计划','数据','销售','门店','复盘','方案','预算','库存','客户','产品','需求'];
 
 // ══════════════════════════════════
-//  语音识别
+//  语音识别（讯飞优先 + 浏览器降级）
+//  麦克风只申请一次，长持连接
 // ══════════════════════════════════
-function initRecog() {
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if (!SR) { alert('请使用 Chrome 或 Edge 浏览器，并开启麦克风权限'); return null; }
-  const r=new SR();
-  r.lang='zh-CN'; r.continuous=true; r.interimResults=true; r.maxAlternatives=1;
-  r.onresult=e=>{
-    let tmp='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      const t=e.results[i][0].transcript;
-      if(e.results[i].isFinal) commitLine(t.trim()); else tmp+=t;
-    }
-    if(tmp) showInterim(tmp);
-  };
-  r.onerror=e=>{ if(e.error!=='no-speech') console.warn(e.error); };
-  r.onend=()=>{ if(running&&!paused) setTimeout(()=>{ try{r.start()}catch(e){} },300); };
-  return r;
+
+// ── 公共：申请麦克风（只做一次）──
+let _micStream = null;
+async function getMicStream() {
+  if (_micStream && _micStream.active) return _micStream;
+  _micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  return _micStream;
 }
 
-function showInterim(t) {
-  document.getElementById('cur-sp').textContent=CFG.speaker;
-  document.getElementById('cur-txt').innerHTML=t+'<span class="cursor"></span>';
+// ══════════════════════════════════
+//  讯飞 WebSocket 实时语音转写
+// ══════════════════════════════════
+let _xfWs = null;
+let _xfRecorder = null;
+let _xfRunning = false;
+
+function xfGetAuthUrl() {
+  const { xfAppId, xfApiKey, xfApiSecret } = CFG;
+  const host = 'iat-api.xfyun.cn';
+  const path = '/v2/iat';
+  const date = new Date().toUTCString();
+  const signStr = `host: ${host}\ndate: ${date}\nGET ${path} HTTP/1.1`;
+  // HMAC-SHA256 via SubtleCrypto
+  return crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(xfApiSecret), { name:'HMAC', hash:'SHA-256' }, false, ['sign']
+  ).then(key => crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signStr)))
+   .then(sig => {
+    const b64 = btoa(String.fromCharCode(...new Uint8Array(sig)));
+    const auth = btoa(`api_key="${xfApiKey}", algorithm="hmac-sha256", headers="host date request-line", signature="${b64}"`);
+    return `wss://${host}${path}?authorization=${encodeURIComponent(auth)}&date=${encodeURIComponent(date)}&host=${encodeURIComponent(host)}`;
+  });
 }
 
-function commitLine(t) {
-  if(!t) return;
-  document.getElementById('cur-txt').innerHTML='<span class="cursor"></span>';
-  const now=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const e={time:now,speaker:CFG.speaker,text:t};
-  transcript.push(e);
-  addHistItem(e);
-  updateStats(t);
+async function startXfAsr() {
+  if (!CFG.xfAppId || !CFG.xfApiKey || !CFG.xfApiSecret) {
+    console.warn('讯飞配置不完整，降级到浏览器识别');
+    return startBrowserAsr();
+  }
+  try {
+    const stream = await getMicStream();
+    const url = await xfGetAuthUrl();
+    _xfWs = new WebSocket(url);
+    _xfRunning = true;
+    let interimBuf = '';
+
+    _xfWs.onopen = () => {
+      // 发送开始帧
+      _xfWs.send(JSON.stringify({
+        common: { app_id: CFG.xfAppId },
+        business: { language:'zh_cn', domain:'iat', accent:'mandarin', vad_eos:3000, dwa:'wpgs' },
+        data: { status:0, format:'audio/L16;rate=16000', encoding:'raw', audio:'' }
+      }));
+      // MediaRecorder：16kHz PCM 分片发送
+      _xfRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+      const audioCtx = new AudioContext({ sampleRate: 16000 });
+      const src = audioCtx.createMediaStreamSource(stream);
+      const proc = audioCtx.createScriptProcessor(4096, 1, 1);
+      src.connect(proc); proc.connect(audioCtx.destination);
+
+      proc.onaudioprocess = e => {
+        if (!_xfRunning || !_xfWs || _xfWs.readyState !== WebSocket.OPEN) return;
+        const f32 = e.inputBuffer.getChannelData(0);
+        const i16 = new Int16Array(f32.length);
+        for (let i=0; i<f32.length; i++) i16[i] = Math.max(-32768, Math.min(32767, f32[i]*32768));
+        const b64 = btoa(String.fromCharCode(...new Uint8Array(i16.buffer)));
+        _xfWs.send(JSON.stringify({ data: { status:1, format:'audio/L16;rate=16000', encoding:'raw', audio: b64 } }));
+      };
+      _xfRecorder._proc = proc; _xfRecorder._ctx = audioCtx;
+    };
+
+    _xfWs.onmessage = e => {
+      try {
+        const d = JSON.parse(e.data);
+        if (d.code !== 0) { console.warn('讯飞错误', d.message); return; }
+        const ws = d.data?.result?.ws || [];
+        const text = ws.map(w => w.cw.map(c=>c.w).join('')).join('');
+        const isFinal = d.data?.result?.ls === true || d.data?.status === 2;
+        if (isFinal && text.trim()) {
+          commitLine(text.trim());
+          interimBuf = '';
+        } else if (text) {
+          interimBuf = text;
+          showInterim(interimBuf);
+        }
+      } catch(err) { console.warn(err); }
+    };
+
+    _xfWs.onerror = err => {
+      console.warn('讯飞 WS 错误，尝试重连', err);
+      if (_xfRunning) setTimeout(() => startXfAsr(), 1000);
+    };
+
+    _xfWs.onclose = () => {
+      if (_xfRunning) setTimeout(() => startXfAsr(), 800);
+    };
+
+  } catch(err) {
+    console.warn('讯飞启动失败，降级浏览器识别:', err);
+    startBrowserAsr();
+  }
 }
 
-function addHistItem(e) {
-  const list=document.getElementById('hlist');
-  const ph=list.querySelector('[data-ph]'); if(ph) ph.remove();
-  const d=document.createElement('div'); d.className='hitem';
-  d.innerHTML=`<div class="hav">${e.speaker.slice(0,1)}</div><div class="hbody"><div class="hname">${e.speaker}</div><div class="htxt">${e.text}</div><div class="htime">${e.time}</div></div>`;
-  list.appendChild(d); list.scrollTop=list.scrollHeight;
+function stopXfAsr() {
+  _xfRunning = false;
+  if (_xfWs) {
+    try {
+      if (_xfWs.readyState === WebSocket.OPEN)
+        _xfWs.send(JSON.stringify({ data: { status:2, format:'audio/L16;rate=16000', encoding:'raw', audio:'' } }));
+      _xfWs.close();
+    } catch(e){}
+    _xfWs = null;
+  }
+  if (_xfRecorder?._proc) { try { _xfRecorder._proc.disconnect(); _xfRecorder._ctx.close(); } catch(e){} }
+  _xfRecorder = null;
+}
+
+// ══════════════════════════════════
+//  浏览器内置 ASR（降级 / 备用）
+// ══════════════════════════════════
+let _brRecog = null;
+
+function startBrowserAsr() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('请使用 Chrome/Edge，或配置讯飞 API'); return; }
+  // 先确保麦克风已授权（触发一次授权弹窗即可）
+  getMicStream().then(() => {
+    _brRecog = new SR();
+    _brRecog.lang = 'zh-CN';
+    _brRecog.continuous = true;
+    _brRecog.interimResults = true;
+    _brRecog.maxAlternatives = 1;
+    _brRecog.onresult = e => {
+      let tmp = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) commitLine(t.trim()); else tmp += t;
+      }
+      if (tmp) showInterim(tmp);
+    };
+    _brRecog.onerror = e => { if (e.error !== 'no-speech') console.warn(e.error); };
+    // continuous=true 时浏览器仍会 onend，但麦克风流已保持，静默重启不重新申请权限
+    _brRecog.onend = () => { if (running && !paused) { try { _brRecog.start(); } catch(e){} } };
+    _brRecog.start();
+  }).catch(() => alert('麦克风授权失败'));
+}
+
+function stopBrowserAsr() {
+  if (_brRecog) { try { _brRecog.stop(); } catch(e){} _brRecog = null; }
+}
+
+// ══════════════════════════════════
+//  统一 ASR 入口
+// ══════════════════════════════════
+function startAsr() {
+  if (CFG.asr === 'xf' && CFG.xfAppId) startXfAsr();
+  else startBrowserAsr();
+}
+function stopAsr() {
+  stopXfAsr();
+  stopBrowserAsr();
+}
+function pauseAsr() { stopAsr(); }
+function resumeAsr() { startAsr(); }
+
+function onAsrChange() {
+  const v = document.getElementById('cfg-asr').value;
+  document.getElementById('fg-xf').style.display = v === 'xf' ? '' : 'none';
+  CFG.asr = v;
 }
 
 // ══════════════════════════════════
@@ -507,7 +655,6 @@ function startTimer() {
 //  会议控制
 // ══════════════════════════════════
 function startMeeting() {
-  recog=initRecog(); if(!recog) return;
   running=true; paused=false;
   hideDoneBanner();
   setPill('on');
@@ -518,15 +665,15 @@ function startMeeting() {
   document.getElementById('btn-pause').disabled=false;
   document.getElementById('btn-view').disabled=false;
   document.getElementById('btn-end').disabled=false;
-  recog.start(); startTimer();
+  startAsr(); startTimer();
   setStatus('录制中','green');
 }
 
 function pauseMeeting() {
   paused=!paused;
   const btn=document.getElementById('btn-pause');
-  if(paused){ recog.stop(); clearInterval(timerInt); setPill('off','已暂停'); btn.textContent='继续'; setStatus('已暂停','amber'); }
-  else { recog.start(); startTimer(); setPill('on'); btn.textContent='暂停'; setStatus('录制中','green'); }
+  if(paused){ pauseAsr(); clearInterval(timerInt); setPill('off','已暂停'); btn.textContent='继续'; setStatus('已暂停','amber'); }
+  else { resumeAsr(); startTimer(); setPill('on'); btn.textContent='暂停'; setStatus('录制中','green'); }
 }
 
 function setPill(state, label='') {
@@ -543,7 +690,7 @@ function endMeeting() {
   if(!confirm('确认结束会议？\nAI 将在后台生成结构化纪要，无需等待。')) return;
 
   running=false; paused=false;
-  if(recog) recog.stop();
+  stopAsr();
   clearInterval(timerInt);
   setPill('async');
 
@@ -577,7 +724,9 @@ function endMeeting() {
 // ══════════════════════════════════
 async function runAsyncJob(snap) {
   try {
-    updateAsyncBanner('正在调用 AI 分析会议内容...');
+    updateAsyncBanner('正在分析会议内容质量与合理性...');
+    await new Promise(r=>setTimeout(r,600));
+    updateAsyncBanner('正在生成结构化会议纪要...');
     const minutes = await generateMinutes(snap);
     snap.minutes = minutes;
     currentMinutes = minutes;
@@ -777,16 +926,27 @@ async function generateMinutes(snap) {
   };
   const detailHint = detailMap[CFG.detail] || detailMap.standard;
 
-  const prompt = `你是专业会议纪要助手。请将会议内容整理为结构化 JSON 格式纪要。
+  const prompt = `你是专业会议纪要助手。请完成以下两步任务：
+
+【第一步：内容合理性分析与清洗】
+对语音识别记录进行质量评估，识别并修正以下问题：
+1. 明显的同音字错误（如"已经"识别为"以经"）
+2. 断句错误导致的语义碎片（将相关碎片合并）
+3. 无意义噪音词（如"嗯""啊""那个那个"等口头禅可省略）
+4. 识别错误导致的乱码或无法理解的内容（标记为[识别异常]）
+5. 重复表达（合并相同意思的多次表述）
+
+【第二步：生成结构化纪要】
+基于清洗后的内容，按照正式会议纪要模板格式生成纪要。
 
 会议信息：
-- 会议室：${snap.room}
+- 会议名称：${snap.room}
 - 开始时间：${snap.startAt}
 - 结束时间：${snap.endAt}
 - 时长：${dur}
 - 总记录条数：${snap.transcript.length}
 
-会议记录：
+会议记录（原始语音识别）：
 ${txText}
 
 详细程度要求：${detailHint}
@@ -794,9 +954,20 @@ ${txText}
 请严格按以下 JSON 格式返回，不要有任何其他内容：
 
 {
-  "summary": "2-3句话总结本次会议核心内容和结论",
+  "cleanQuality": "high|medium|low",
+  "cleanNotes": "简短说明识别质量，如有大量识别错误请说明",
+  "summary": "2-4句话总结本次会议背景、核心议题和主要结论",
+  "background": "1-2句话说明本次会议召开背景与目的（若能从内容推断）",
   "topics": [
-    { "title": "议题名称", "conclusion": "该议题的讨论结论或决定" }
+    {
+      "title": "议题名称",
+      "detail": "该议题的详细讨论内容（2-4句），包含关键数据和讨论要点",
+      "conclusion": "该议题的明确结论或决定（1-2句）",
+      "keyPoints": ["核心要点1", "核心要点2"]
+    }
+  ],
+  "decisions": [
+    { "no": 1, "content": "关键决策或共识内容", "basis": "决策依据或背景" }
   ],
   "actions": [
     { "task": "具体任务描述", "owner": "负责人，不明确写待指定", "deadline": "截止时间，不明确写待定", "priority": "high|mid|low" }
@@ -804,7 +975,13 @@ ${txText}
   "followups": ["待跟进事项描述"]
 }
 
-要求：topics 最少1条最多8条；actions 只列明确分工的，没有则空数组；followups 列未确认或需后续跟进的；所有文字用中文。`;
+要求：
+- topics 最少1条最多8条，每条必须有 title、detail、conclusion、keyPoints
+- decisions 列出本次会议形成的明确决策共识，没有则空数组
+- actions 只列明确分工的，没有则空数组
+- followups 列未确认或需后续跟进的
+- 所有文字用中文
+- keyPoints 每条最多3个，每个不超过15字`;
 
   const res = await fetch(`${baseUrl}/chat/completions`, {
     method: 'POST',
@@ -840,9 +1017,20 @@ ${txText}
 // ══════════════════════════════════
 function demoMinutes(snap, dur) {
   return {
+    cleanQuality: 'high',
+    cleanNotes: '示例模式，请填写 API Key 以生成真实纪要',
     summary: `本次会议在 ${snap.room} 召开，时长 ${dur}，共记录 ${snap.transcript.length} 条发言。当前为示例模式，请在「配置」面板填写 API Key 以生成真实纪要。`,
+    background: '本次会议为示例演示，实际使用时将根据真实会议内容自动生成背景说明。',
     topics: [
-      { title: '示例议题', conclusion: '与会人员就相关议题进行讨论并形成初步共识，明确了下一阶段工作方向。' }
+      {
+        title: '示例议题',
+        detail: '与会人员就相关议题进行深入讨论，围绕核心问题展开分析，提出了多项解决思路和改进方向。',
+        conclusion: '形成初步共识，明确了下一阶段工作方向。',
+        keyPoints: ['核心问题已明确', '改进方向已确定']
+      }
+    ],
+    decisions: [
+      { no: 1, content: '推进相关工作并跟踪进展', basis: '与会人员充分讨论后达成共识' }
     ],
     actions: [
       { task: '整理本次会议要点并分发给相关人员', owner: '待指定', deadline: '今日内', priority: 'high' },
@@ -858,7 +1046,6 @@ function demoMinutes(snap, dur) {
 //  渲染结构化纪要
 // ══════════════════════════════════
 function renderMinutes(data, snap) {
-  // 兼容旧版原始文本
   if (typeof data === 'string' || (data && data._raw)) {
     const raw = typeof data === 'string' ? data : data._raw;
     document.getElementById('mbody').innerHTML = `<div style="font-size:13px;color:var(--txt);line-height:1.8;white-space:pre-wrap;font-family:var(--sans)">${escHtml(raw)}</div>`;
@@ -867,105 +1054,113 @@ function renderMinutes(data, snap) {
   }
 
   const dur = snap ? `${Math.floor(snap.duration/60)}分${snap.duration%60}秒` : '';
-  const prioMap = { high:['prio-high','P0'], mid:['prio-mid','P1'], low:['prio-low','P2'] };
+  const cnNums = ['一','二','三','四','五','六','七','八','九','十'];
 
-  // 纯文本 for 复制
-  let plainText = `【SANI 会议纪要】\n会议室：${snap?.room||''}\n时间：${snap?.endAt||''}\n时长：${dur}\n\n`;
-  plainText += `【会议概要】\n${data.summary||''}\n\n`;
+  // 纯文本（复制用）
+  let plainText = `会议纪要\n\n${snap?.room||''}\n时间：${snap?.endAt||''} | 参与人：${CFG.speaker}\n\n`;
+  if(data.background) plainText += `一、会议背景\n${data.background}\n\n`;
+  plainText += `${data.background?'二':'一'}、会议概要\n${data.summary||''}\n\n`;
+  let si = data.background ? 2 : 1;
   if(data.topics?.length) {
-    plainText += `【主要议题】\n`;
-    data.topics.forEach((t,i)=>{ plainText += `${i+1}. ${t.title}：${t.conclusion}\n`; });
-    plainText += '\n';
+    plainText += `${cnNums[si]||si+1}、主要议题\n`;
+    data.topics.forEach((t,i) => {
+      plainText += `\n${i+1}. ${t.title}\n${t.detail||''}\n`;
+      if(t.keyPoints?.length) plainText += t.keyPoints.map(k=>`   · ${k}`).join('\n')+'\n';
+      plainText += `结论：${t.conclusion||''}\n`;
+    });
+    plainText += '\n'; si++;
+  }
+  if(data.decisions?.length) {
+    plainText += `${cnNums[si]||si+1}、关键决策\n`;
+    data.decisions.forEach(d => { plainText += `${d.no}. ${d.content}\n`; });
+    plainText += '\n'; si++;
   }
   if(data.actions?.length) {
-    plainText += `【行动事项】\n`;
-    data.actions.forEach(a=>{ plainText += `- [${a.owner}] ${a.task}（截止：${a.deadline}）\n`; });
-    plainText += '\n';
+    plainText += `${cnNums[si]||si+1}、行动事项\n`;
+    data.actions.forEach(a => { plainText += `- [${a.owner}] ${a.task}（截止：${a.deadline}）\n`; });
+    plainText += '\n'; si++;
   }
   if(data.followups?.length) {
-    plainText += `【待跟进】\n`;
-    data.followups.forEach(f=>{ plainText += `- ${f}\n`; });
+    plainText += `${cnNums[si]||si+1}、待跟进\n`;
+    data.followups.forEach(f => { plainText += `- ${f}\n`; });
   }
   document.getElementById('raw-min').value = plainText;
 
-  // HTML 渲染
-  let html = `<div class="min-wrap">`;
+  // ── HTML 渲染（简洁模板风格）──
+  let sn = 0; // 章节编号计数
+  const sec = (title) => {
+    sn++;
+    return `<div class="ms-sec-head">${cnNums[sn-1]||sn}、${title}</div>`;
+  };
+
+  // 识别质量提示
+  let qualityHtml = '';
+  if (data.cleanNotes && data.cleanQuality !== 'high') {
+    const isLow = data.cleanQuality === 'low';
+    qualityHtml = `<div class="ms-quality ${isLow?'ms-q-low':'ms-q-mid'}">⚠ 识别质量${isLow?'较差':'一般'}：${escHtml(data.cleanNotes)}</div>`;
+  }
+
+  let html = `<div class="ms-wrap">${qualityHtml}`;
 
   // 头部
-  html += `<div class="min-header">
-    <div class="min-header-title">📋 ${escHtml(snap?.room||'会议纪要')}</div>
-    <div class="mh-item"><div class="mh-label">时间</div><div class="mh-value">${escHtml(snap?.endAt||'')}</div></div>
-    <div class="mh-item"><div class="mh-label">时长 / 记录</div><div class="mh-value">${dur} · ${snap?.transcript?.length||0} 句</div></div>
+  html += `<div class="ms-header">
+    <div class="ms-title">会议纪要</div>
+    <div class="ms-meta">${escHtml(snap?.room||'')} · ${escHtml(snap?.endAt||'')} · 时长 ${dur}</div>
   </div>`;
 
-  // 概要
-  html += `<div class="min-section">
-    <div class="min-sec-head">
-      <div class="min-sec-icon icon-summary">💡</div>
-      <div class="min-sec-title">会议概要</div>
-    </div>
-    <div class="min-summary-text">${escHtml(data.summary||'暂无')}</div>
-  </div>`;
+  // 会议背景
+  if (data.background) {
+    html += sec('会议背景');
+    html += `<div class="ms-para">${escHtml(data.background)}</div>`;
+  }
 
-  // 议题
+  // 会议概要
+  html += sec('会议概要');
+  html += `<div class="ms-para">${escHtml(data.summary||'暂无')}</div>`;
+
+  // 主要议题
   if (data.topics?.length) {
-    const topicsHtml = data.topics.map(t=>`<div class="topic-item">
-      <div class="topic-title">${escHtml(t.title||'')}</div>
-      <div class="topic-conclusion">${escHtml(t.conclusion||'')}</div>
-    </div>`).join('');
-    html += `<div class="min-section">
-      <div class="min-sec-head">
-        <div class="min-sec-icon icon-topic">📌</div>
-        <div class="min-sec-title">主要议题 · ${data.topics.length} 项</div>
-      </div>
-      <div class="topic-list">${topicsHtml}</div>
-    </div>`;
+    html += sec(`主要议题`);
+    data.topics.forEach((t,i) => {
+      html += `<div class="ms-topic">
+        <div class="ms-topic-title">${i+1}. ${escHtml(t.title||'')}</div>
+        <div class="ms-topic-detail">${escHtml(t.detail||'')}</div>`;
+      if (t.keyPoints?.length) {
+        html += `<ul class="ms-kp">${t.keyPoints.map(k=>`<li>${escHtml(k)}</li>`).join('')}</ul>`;
+      }
+      html += `<div class="ms-conclusion"><span class="ms-c-label">结论</span>${escHtml(t.conclusion||'')}</div>
+      </div>`;
+    });
+  }
+
+  // 关键决策
+  if (data.decisions?.length) {
+    html += sec('关键决策与共识');
+    data.decisions.forEach(d => {
+      html += `<div class="ms-decision">${d.no}. ${escHtml(d.content||'')}`;
+      if(d.basis) html += `<span class="ms-basis"> （${escHtml(d.basis)}）</span>`;
+      html += `</div>`;
+    });
   }
 
   // 行动事项
-  html += `<div class="min-section">
-    <div class="min-sec-head">
-      <div class="min-sec-icon icon-action">✅</div>
-      <div class="min-sec-title">行动事项 · ${data.actions?.length||0} 条</div>
-    </div>`;
   if (data.actions?.length) {
-    html += `<table class="action-table">
-      <thead><tr>
-        <th style="width:44%">任务</th>
-        <th style="width:18%">负责人</th>
-        <th style="width:20%">截止时间</th>
-        <th style="width:18%">优先级</th>
-      </tr></thead>
-      <tbody>`;
-    data.actions.forEach(a=>{
-      const [cls,lbl] = prioMap[a.priority] || prioMap.mid;
-      html += `<tr>
-        <td>${escHtml(a.task||'')}</td>
-        <td class="td-owner">${escHtml(a.owner||'待指定')}</td>
-        <td class="td-ddl">${escHtml(a.deadline||'待定')}</td>
-        <td><span class="action-prio ${cls}">${lbl}</span></td>
-      </tr>`;
+    html += sec('行动事项');
+    const prioLabel = { high:'紧急', mid:'重要', low:'普通' };
+    html += `<table class="ms-table"><thead><tr><th>任务</th><th>负责人</th><th>截止</th><th>优先级</th></tr></thead><tbody>`;
+    data.actions.forEach(a => {
+      html += `<tr><td>${escHtml(a.task||'')}</td><td>${escHtml(a.owner||'待指定')}</td><td>${escHtml(a.deadline||'待定')}</td><td>${prioLabel[a.priority]||'重要'}</td></tr>`;
     });
     html += `</tbody></table>`;
-  } else {
-    html += `<div class="none-hint">暂无明确行动事项</div>`;
   }
-  html += `</div>`;
 
   // 待跟进
-  html += `<div class="min-section">
-    <div class="min-sec-head">
-      <div class="min-sec-icon icon-followup">🔍</div>
-      <div class="min-sec-title">待跟进事项 · ${data.followups?.length||0} 项</div>
-    </div>`;
   if (data.followups?.length) {
-    html += `<div class="followup-list">` + data.followups.map(f=>`<div class="followup-item"><div class="followup-dot"></div><div class="followup-text">${escHtml(f)}</div></div>`).join('') + `</div>`;
-  } else {
-    html += `<div class="none-hint">暂无待跟进事项</div>`;
+    html += sec('待跟进事项');
+    html += `<ul class="ms-list">${data.followups.map(f=>`<li>${escHtml(f)}</li>`).join('')}</ul>`;
   }
-  html += `</div>`;
 
-  html += `</div>`; // .min-wrap
+  html += `</div>`;
   document.getElementById('mbody').innerHTML = html;
 }
 
@@ -1009,10 +1204,27 @@ function openModal(title, minutes, snap) {
   document.getElementById('mbadge').textContent = snap?.room || 'SANI';
   _modalData = { minutes, snap };
   renderMinutes(minutes, snap);
+  // 显示转录按钮（如有记录）
+  const tBtn = document.getElementById('btn-transcript');
+  if (snap?.transcript?.length) {
+    tBtn.style.display = '';
+    const tc = document.getElementById('transcript-content');
+    tc.innerHTML = snap.transcript.map(e=>`<div style="margin-bottom:6px"><span style="color:var(--td)">${e.time}</span> <span style="color:var(--gl);font-weight:600">${escHtml(e.speaker)}</span><span style="color:var(--tm)">：</span>${escHtml(e.text)}</div>`).join('');
+  } else {
+    tBtn.style.display = 'none';
+  }
   document.getElementById('modal').style.display = 'flex';
 }
 
-function closeModal() { document.getElementById('modal').style.display='none'; }
+function toggleTranscript() {
+  const p = document.getElementById('transcript-panel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display='none';
+  document.getElementById('transcript-panel').style.display='none';
+}
 
 function copyMin() {
   const text = document.getElementById('raw-min').value;
@@ -1173,289 +1385,194 @@ async function exportWordStructured(data, snap) {
   if (!docxLib) throw new Error('docx 库未加载，请刷新重试');
   const {
     Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-    AlignmentType, HeadingLevel, BorderStyle, WidthType, ShadingType,
-    VerticalAlign, LevelFormat, Header, Footer, PageNumber,
-    TabStopType, TabStopPosition
+    AlignmentType, BorderStyle, WidthType, ShadingType, VerticalAlign,
+    LevelFormat, Header, Footer, PageNumber, TabStopType, TabStopPosition
   } = docxLib;
 
-  const dur = snap ? `${Math.floor(snap.duration/60)}分${snap.duration%60}秒` : '';
+  const dur  = snap ? `${Math.floor(snap.duration/60)}分${snap.duration%60}秒` : '';
   const room = snap?.room || 'SANI';
   const endAt = snap?.endAt || new Date().toLocaleString('zh-CN');
-  const sentences = snap?.transcript?.length || 0;
+  const cnNums = ['一','二','三','四','五','六','七','八','九','十'];
 
-  // ── 颜色常量 ──
-  const C_GREEN  = '00C47D';
-  const C_GREEN_L= 'E6F9F3';
-  const C_BLUE   = '4D9DE0';
-  const C_BLUE_L = 'EBF4FC';
-  const C_PURPLE = '9B8CE8';
-  const C_PURPLE_L='F0EEF9';
-  const C_AMBER  = 'F5A623';
-  const C_AMBER_L= 'FEF6E8';
-  const C_RED    = 'E53E3E';
-  const C_RED_L  = 'FEF0F0';
-  const C_GRAY_H = 'F4F6F8';
-  const C_GRAY_BD= 'DDE3EC';
-  const C_TXT    = '2D3748';
-  const C_TXT_M  = '64748B';
-  const C_WHITE  = 'FFFFFF';
-  const C_HEADER_BG = '0A0C10';
+  const PAGE_W  = 11906;
+  const MARGIN  = 1440;
+  const CONT_W  = PAGE_W - MARGIN * 2;
 
-  // ── 边框辅助 ──
-  const border1 = (color) => ({ style: BorderStyle.SINGLE, size: 1, color: color || C_GRAY_BD });
-  const noBorder = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
-  const allBorders = (color) => ({ top:border1(color), bottom:border1(color), left:border1(color), right:border1(color) });
-  const noBorders = { top:noBorder, bottom:noBorder, left:noBorder, right:noBorder };
+  const F = 'Microsoft YaHei';
+  const C_BLK = '1A1A1A';
+  const C_MID = '555555';
+  const C_LT  = '888888';
+  const C_BD  = 'CCCCCC';
+  const C_WHT = 'FFFFFF';
 
-  const PAGE_W = 11906; // A4
-  const MARGIN = 1200;
-  const CONTENT_W = PAGE_W - MARGIN * 2; // 9506 DXA
-
-  // ── 段落间距辅助 ──
-  const sp = (before=0, after=0) => ({ spacing: { before, after } });
-
-  // ── 节标题段落 ──
-  function sectionHeader(icon, title, bgColor, textColor) {
-    return new Paragraph({
-      ...sp(240, 120),
-      shading: { fill: bgColor, type: ShadingType.CLEAR },
-      border: { left: { style: BorderStyle.SINGLE, size: 18, color: textColor } },
-      indent: { left: 180, right: 0 },
-      children: [
-        new TextRun({ text: `${icon}  ${title}`, bold: true, size: 24, color: textColor, font: 'Microsoft YaHei' }),
-      ]
-    });
-  }
-
-  // ── 分隔空段 ──
-  const blank = (n=1) => Array.from({length:n}, ()=> new Paragraph({ ...sp(0,0), children:[new TextRun('')] }));
+  const sp = (b=0,a=0) => ({ spacing:{ before:b, after:a } });
+  const bd1 = { style: BorderStyle.SINGLE, size:4, color:C_BD };
+  const noBd = { style: BorderStyle.NONE, size:0, color:C_WHT };
+  const allNoBd = { top:noBd,bottom:noBd,left:noBd,right:noBd };
 
   const children = [];
+  let secN = 0;
+  const secHead = (title) => {
+    secN++;
+    return new Paragraph({
+      ...sp(280,80),
+      border: { bottom:{ style:BorderStyle.SINGLE, size:6, color:C_BD } },
+      children:[new TextRun({ text:`${cnNums[secN-1]||secN}、${title}`, bold:true, size:26, color:C_BLK, font:F })]
+    });
+  };
+  const body = (txt, indent=0) => new Paragraph({
+    ...sp(60,60), indent:{ left:indent },
+    children:[new TextRun({ text:txt||'', size:22, color:C_MID, font:F })]
+  });
+  const blank = () => new Paragraph({ ...sp(0,0), children:[new TextRun('')] });
 
-  // ════════════════════════════════
-  //  ① 封面头部信息块
-  // ════════════════════════════════
-  // 顶部色条
+  // ── 标题区 ──
   children.push(new Paragraph({
-    ...sp(0, 0),
-    shading: { fill: C_HEADER_BG, type: ShadingType.CLEAR },
-    border: { bottom: { style: BorderStyle.SINGLE, size: 24, color: C_GREEN } },
-    children: [
-      new TextRun({ text: '  SANI 会议助手', bold: true, size: 32, color: C_WHITE, font: 'Microsoft YaHei' }),
-      new TextRun({ text: '  ·  ', size: 24, color: '888888' }),
-      new TextRun({ text: '会议纪要', size: 26, color: 'AAAAAA', font: 'Microsoft YaHei' }),
-    ]
+    ...sp(0,60), alignment:AlignmentType.CENTER,
+    children:[new TextRun({ text:'会议纪要', bold:true, size:36, color:C_BLK, font:F })]
   }));
-
-  // 信息卡（四格）
-  const infoTableRows = [
-    ['会议室', room, '时长', dur],
-    ['时间', endAt, '记录条数', `${sentences} 句`],
-  ];
-  const colW = [CONTENT_W*0.18, CONTENT_W*0.32, CONTENT_W*0.18, CONTENT_W*0.32].map(Math.round);
-
-  const infoRows = infoTableRows.map(row =>
-    new TableRow({
-      children: [
-        new TableCell({ borders: noBorders, width:{size:colW[0],type:WidthType.DXA}, shading:{fill:C_GRAY_H,type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:160,right:80},
-          children:[new Paragraph({children:[new TextRun({text:row[0], bold:true, size:18, color:C_TXT_M, font:'Microsoft YaHei'})]})] }),
-        new TableCell({ borders: noBorders, width:{size:colW[1],type:WidthType.DXA}, shading:{fill:C_WHITE,type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:120,right:80},
-          children:[new Paragraph({children:[new TextRun({text:row[1], size:20, color:C_TXT, font:'Microsoft YaHei'})]})] }),
-        new TableCell({ borders: noBorders, width:{size:colW[2],type:WidthType.DXA}, shading:{fill:C_GRAY_H,type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:160,right:80},
-          children:[new Paragraph({children:[new TextRun({text:row[2], bold:true, size:18, color:C_TXT_M, font:'Microsoft YaHei'})]})] }),
-        new TableCell({ borders: noBorders, width:{size:colW[3],type:WidthType.DXA}, shading:{fill:C_WHITE,type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:120,right:80},
-          children:[new Paragraph({children:[new TextRun({text:row[3], size:20, color:C_TXT, font:'Microsoft YaHei'})]})] }),
-      ]
-    })
-  );
-
-  children.push(new Table({
-    width: { size: CONTENT_W, type: WidthType.DXA },
-    columnWidths: colW,
-    borders: { top:border1(C_GRAY_BD), bottom:border1(C_GRAY_BD), left:border1(C_GRAY_BD), right:border1(C_GRAY_BD), insideH:border1(C_GRAY_BD), insideV:border1(C_GRAY_BD) },
-    rows: infoRows,
-  }));
-
-  // ════════════════════════════════
-  //  ② 会议概要
-  // ════════════════════════════════
-  children.push(...blank(1));
-  children.push(sectionHeader('💡', '会议概要', C_BLUE_L, C_BLUE));
   children.push(new Paragraph({
-    ...sp(80, 80),
-    indent: { left: 200 },
-    children: [new TextRun({ text: data.summary || '暂无', size: 22, color: C_TXT, font: 'Microsoft YaHei' })]
+    ...sp(0,0), alignment:AlignmentType.CENTER,
+    children:[new TextRun({ text:`${room}`, size:24, color:C_MID, font:F })]
+  }));
+  children.push(new Paragraph({
+    ...sp(60,240), alignment:AlignmentType.CENTER,
+    children:[new TextRun({ text:`时间：${endAt}　|　时长：${dur}　|　参与人：${CFG.speaker}`, size:20, color:C_LT, font:F })]
   }));
 
-  // ════════════════════════════════
-  //  ③ 主要议题
-  // ════════════════════════════════
+  // ── 会议背景 ──
+  if (data.background) {
+    children.push(secHead('会议背景'));
+    children.push(body(data.background, 200));
+    children.push(blank());
+  }
+
+  // ── 会议概要 ──
+  children.push(secHead('会议概要'));
+  children.push(body(data.summary||'暂无', 200));
+  children.push(blank());
+
+  // ── 主要议题 ──
   if (data.topics?.length) {
-    children.push(...blank(1));
-    children.push(sectionHeader('📌', `主要议题  ·  ${data.topics.length} 项`, C_PURPLE_L, C_PURPLE));
-    data.topics.forEach((t, i) => {
+    children.push(secHead('主要议题'));
+    data.topics.forEach((t,i) => {
+      // 子标题
       children.push(new Paragraph({
-        ...sp(100, 20),
-        indent: { left: 200 },
-        border: { left: { style: BorderStyle.SINGLE, size: 12, color: C_PURPLE } },
-        shading: { fill: C_PURPLE_L, type: ShadingType.CLEAR },
-        children: [new TextRun({ text: `${i+1}.  ${t.title || ''}`, bold: true, size: 22, color: C_PURPLE, font: 'Microsoft YaHei' })]
+        ...sp(160,40), indent:{ left:200 },
+        children:[new TextRun({ text:`${i+1}.  ${t.title||''}`, bold:true, size:23, color:C_BLK, font:F })]
       }));
+      // 详细内容
+      if (t.detail) children.push(body(t.detail, 400));
+      // 要点
+      if (t.keyPoints?.length) {
+        t.keyPoints.forEach(kp => children.push(new Paragraph({
+          ...sp(30,0), indent:{ left:400, hanging:160 },
+          children:[
+            new TextRun({ text:'·  ', size:20, color:C_LT }),
+            new TextRun({ text:kp, size:20, color:C_MID, font:F })
+          ]
+        })));
+      }
+      // 结论行
       children.push(new Paragraph({
-        ...sp(40, 80),
-        indent: { left: 320 },
-        children: [new TextRun({ text: t.conclusion || '', size: 20, color: C_TXT, font: 'Microsoft YaHei' })]
-      }));
-    });
-  }
-
-  // ════════════════════════════════
-  //  ④ 行动事项（带颜色表格）
-  // ════════════════════════════════
-  children.push(...blank(1));
-  children.push(sectionHeader('✅', `行动事项  ·  ${data.actions?.length||0} 条`, C_GREEN_L, C_GREEN));
-
-  if (data.actions?.length) {
-    // 表头
-    const aColW = [
-      Math.round(CONTENT_W*0.42),
-      Math.round(CONTENT_W*0.18),
-      Math.round(CONTENT_W*0.22),
-      Math.round(CONTENT_W*0.18),
-    ];
-    const thCell = (txt, w) => new TableCell({
-      width:{size:w,type:WidthType.DXA},
-      shading:{fill:C_GREEN,type:ShadingType.CLEAR},
-      borders: allBorders(C_GREEN),
-      margins:{top:80,bottom:80,left:120,right:80},
-      verticalAlign: VerticalAlign.CENTER,
-      children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:txt,bold:true,size:19,color:C_WHITE,font:'Microsoft YaHei'})]})]
-    });
-
-    const prioStyle = {
-      high: { bg: C_RED_L,   txt: C_RED,    label: 'P0 紧急' },
-      mid:  { bg: C_AMBER_L, txt: C_AMBER,  label: 'P1 重要' },
-      low:  { bg: C_GRAY_H,  txt: C_TXT_M,  label: 'P2 普通' },
-    };
-
-    const actionRows = [
-      new TableRow({ tableHeader: true, children: [
-        thCell('任务内容', aColW[0]),
-        thCell('负责人', aColW[1]),
-        thCell('截止时间', aColW[2]),
-        thCell('优先级', aColW[3]),
-      ]}),
-      ...data.actions.map((a, idx) => {
-        const ps = prioStyle[a.priority] || prioStyle.mid;
-        const rowBg = idx % 2 === 0 ? C_WHITE : C_GRAY_H;
-        const tdBorder = allBorders(C_GRAY_BD);
-        const tdM = {top:80,bottom:80,left:120,right:80};
-        return new TableRow({ children: [
-          new TableCell({ borders:tdBorder, width:{size:aColW[0],type:WidthType.DXA}, shading:{fill:rowBg,type:ShadingType.CLEAR}, margins:tdM, verticalAlign:VerticalAlign.CENTER,
-            children:[new Paragraph({children:[new TextRun({text:a.task||'',size:20,color:C_TXT,font:'Microsoft YaHei'})]})] }),
-          new TableCell({ borders:tdBorder, width:{size:aColW[1],type:WidthType.DXA}, shading:{fill:rowBg,type:ShadingType.CLEAR}, margins:tdM, verticalAlign:VerticalAlign.CENTER,
-            children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:a.owner||'待指定',bold:true,size:20,color:C_GREEN,font:'Microsoft YaHei'})]})] }),
-          new TableCell({ borders:tdBorder, width:{size:aColW[2],type:WidthType.DXA}, shading:{fill:rowBg,type:ShadingType.CLEAR}, margins:tdM, verticalAlign:VerticalAlign.CENTER,
-            children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:a.deadline||'待定',size:20,color:C_AMBER,font:'Microsoft YaHei'})]})] }),
-          new TableCell({ borders:tdBorder, width:{size:aColW[3],type:WidthType.DXA}, shading:{fill:ps.bg,type:ShadingType.CLEAR}, margins:tdM, verticalAlign:VerticalAlign.CENTER,
-            children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:ps.label,bold:true,size:18,color:ps.txt,font:'Microsoft YaHei'})]})] }),
-        ]});
-      })
-    ];
-
-    children.push(new Table({
-      width:{size:CONTENT_W,type:WidthType.DXA},
-      columnWidths: aColW,
-      rows: actionRows,
-    }));
-  } else {
-    children.push(new Paragraph({ ...sp(60,60), indent:{left:200},
-      children:[new TextRun({text:'暂无明确行动事项',size:20,color:C_TXT_M,font:'Microsoft YaHei',italics:true})]
-    }));
-  }
-
-  // ════════════════════════════════
-  //  ⑤ 待跟进事项
-  // ════════════════════════════════
-  children.push(...blank(1));
-  children.push(sectionHeader('🔍', `待跟进事项  ·  ${data.followups?.length||0} 项`, C_AMBER_L, C_AMBER));
-
-  if (data.followups?.length) {
-    data.followups.forEach(f => {
-      children.push(new Paragraph({
-        ...sp(80, 40),
-        indent: { left: 200, hanging: 200 },
-        shading: { fill: C_AMBER_L, type: ShadingType.CLEAR },
-        border: { left: { style: BorderStyle.SINGLE, size: 12, color: C_AMBER } },
-        children: [
-          new TextRun({ text: '▸  ', bold: true, size: 20, color: C_AMBER }),
-          new TextRun({ text: f, size: 20, color: C_TXT, font: 'Microsoft YaHei' })
+        ...sp(60,80), indent:{ left:400 },
+        children:[
+          new TextRun({ text:'结论：', bold:true, size:21, color:C_BLK, font:F }),
+          new TextRun({ text:t.conclusion||'', size:21, color:C_MID, font:F })
         ]
       }));
     });
-  } else {
-    children.push(new Paragraph({ ...sp(60,60), indent:{left:200},
-      children:[new TextRun({text:'暂无待跟进事项',size:20,color:C_TXT_M,font:'Microsoft YaHei',italics:true})]
-    }));
+    children.push(blank());
   }
 
-  // ════════════════════════════════
-  //  ⑥ 页脚分隔 + 生成标注
-  // ════════════════════════════════
-  children.push(...blank(2));
+  // ── 关键决策 ──
+  if (data.decisions?.length) {
+    children.push(secHead('关键决策与共识'));
+    data.decisions.forEach(d => {
+      children.push(new Paragraph({
+        ...sp(80,20), indent:{ left:200 },
+        children:[
+          new TextRun({ text:`${d.no}.  `, bold:true, size:22, color:C_BLK, font:F }),
+          new TextRun({ text:d.content||'', size:22, color:C_MID, font:F }),
+          ...(d.basis ? [new TextRun({ text:`（${d.basis}）`, size:19, color:C_LT, font:F, italics:true })] : [])
+        ]
+      }));
+    });
+    children.push(blank());
+  }
+
+  // ── 行动事项表格 ──
+  if (data.actions?.length) {
+    children.push(secHead('行动事项'));
+    const cw = [Math.round(CONT_W*0.44), Math.round(CONT_W*0.16), Math.round(CONT_W*0.22), Math.round(CONT_W*0.18)];
+    const th = (txt,w) => new TableCell({
+      width:{size:w,type:WidthType.DXA}, borders:allNoBd,
+      shading:{fill:'F2F2F2',type:ShadingType.CLEAR},
+      margins:{top:80,bottom:80,left:120,right:60},
+      children:[new Paragraph({children:[new TextRun({text:txt,bold:true,size:19,color:C_MID,font:F})]})]
+    });
+    const td = (txt,w,opts={}) => new TableCell({
+      width:{size:w,type:WidthType.DXA},
+      borders:{ top:noBd,bottom:bd1,left:noBd,right:noBd },
+      margins:{top:80,bottom:80,left:120,right:60},
+      children:[new Paragraph({children:[new TextRun({text:txt||'',size:20,font:F,...opts})]})]
+    });
+    const rows = [
+      new TableRow({ children:[ th('任务内容',cw[0]), th('负责人',cw[1]), th('截止时间',cw[2]), th('优先级',cw[3]) ] }),
+      ...data.actions.map(a => new TableRow({ children:[
+        td(a.task||'',    cw[0], {color:C_MID}),
+        td(a.owner||'待指定', cw[1], {bold:true,color:C_BLK}),
+        td(a.deadline||'待定', cw[2], {color:C_MID}),
+        td({high:'紧急',mid:'重要',low:'普通'}[a.priority]||'重要', cw[3], {color:C_MID}),
+      ]}))
+    ];
+    children.push(new Table({ width:{size:CONT_W,type:WidthType.DXA}, columnWidths:cw, rows }));
+    children.push(blank());
+  }
+
+  // ── 待跟进 ──
+  if (data.followups?.length) {
+    children.push(secHead('待跟进事项'));
+    data.followups.forEach(f => children.push(new Paragraph({
+      ...sp(60,40), indent:{ left:200, hanging:160 },
+      children:[
+        new TextRun({ text:'·  ', size:20, color:C_LT }),
+        new TextRun({ text:f||'', size:21, color:C_MID, font:F })
+      ]
+    })));
+    children.push(blank());
+  }
+
+  // ── 页脚签注 ──
+  children.push(blank());
   children.push(new Paragraph({
-    ...sp(0,0),
-    border: { top: { style: BorderStyle.SINGLE, size: 4, color: C_GRAY_BD } },
-    children: []
-  }));
-  children.push(new Paragraph({
-    ...sp(80,0),
-    alignment: AlignmentType.RIGHT,
-    children: [
-      new TextRun({ text: `由 SANI 会议助手自动生成  ·  ${endAt}`, size: 16, color: C_TXT_M, font: 'Microsoft YaHei', italics: true })
-    ]
+    ...sp(0,0), alignment:AlignmentType.RIGHT,
+    border:{ top:{ style:BorderStyle.SINGLE, size:4, color:C_BD } },
+    children:[new TextRun({ text:`纪要整理日期：${endAt}`, size:17, color:C_LT, font:F, italics:true })]
   }));
 
-  // ════════════════════════════════
-  //  构建文档
-  // ════════════════════════════════
+  // ── 构建文档 ──
   const doc = new Document({
-    styles: {
-      default: {
-        document: { run: { font: 'Microsoft YaHei', size: 22, color: C_TXT } }
-      }
-    },
-    sections: [{
-      properties: {
-        page: {
-          size: { width: PAGE_W, height: 16838 },
-          margin: { top: MARGIN, right: MARGIN, bottom: MARGIN, left: MARGIN }
-        }
-      },
-      headers: {
-        default: new Header({ children: [
-          new Paragraph({
-            tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-            shading: { fill: C_HEADER_BG, type: ShadingType.CLEAR },
-            children: [
-              new TextRun({ text: 'SANI 会议助手', bold: true, size: 18, color: C_GREEN, font: 'Microsoft YaHei' }),
-              new TextRun({ text: `\t${room}  ·  ${endAt}`, size: 16, color: '888888', font: 'Microsoft YaHei' }),
-            ]
-          })
+    styles:{ default:{ document:{ run:{ font:F, size:22, color:C_MID } } } },
+    sections:[{
+      properties:{ page:{ size:{width:PAGE_W,height:16838}, margin:{top:MARGIN,right:MARGIN,bottom:MARGIN,left:MARGIN} } },
+      headers:{ default: new Header({ children:[
+        new Paragraph({
+          tabStops:[{type:TabStopType.RIGHT,position:TabStopPosition.MAX}],
+          border:{ bottom:{ style:BorderStyle.SINGLE, size:4, color:C_BD } },
+          children:[
+            new TextRun({ text:room, bold:true, size:18, color:C_BLK, font:F }),
+            new TextRun({ text:`\t${endAt}`, size:16, color:C_LT, font:F }),
+          ]
+        })
+      ]}) },
+      footers:{ default: new Footer({ children:[
+        new Paragraph({ alignment:AlignmentType.CENTER, children:[
+          new TextRun({ text:'第 ', size:16, color:C_LT }),
+          new TextRun({ children:[PageNumber.CURRENT], size:16, color:C_LT }),
+          new TextRun({ text:' 页', size:16, color:C_LT }),
         ]})
-      },
-      footers: {
-        default: new Footer({ children: [
-          new Paragraph({
-            alignment: AlignmentType.CENTER,
-            children: [
-              new TextRun({ text: '第 ', size: 16, color: C_TXT_M }),
-              new TextRun({ children: [PageNumber.CURRENT], size: 16, color: C_TXT_M }),
-              new TextRun({ text: ' 页  |  SANI 会议纪要', size: 16, color: C_TXT_M, font: 'Microsoft YaHei' }),
-            ]
-          })
-        ]})
-      },
+      ]}) },
       children,
     }]
   });
@@ -1464,12 +1581,11 @@ async function exportWordStructured(data, snap) {
   const url = URL.createObjectURL(buf);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `SANI_会议纪要_${room}_${endAt?.replace(/[/:]/g,'-').replace(/\s/g,'_')||'导出'}.docx`;
+  a.download = `会议纪要_${room}_${endAt?.replace(/[/:]/g,'-').replace(/\s/g,'_')||'导出'}.docx`;
   a.click();
   URL.revokeObjectURL(url);
 }
 
-// 纯文本降级导出
 async function exportWordRaw(raw, snap) {
   const docxLib = window.docx;
   if (!docxLib) throw new Error('docx 库未加载，请刷新重试');
@@ -1508,12 +1624,16 @@ function stab(id,el) {
 //  配置
 // ══════════════════════════════════
 function saveConfig() {
-  CFG.room     = document.getElementById('cfg-room').value.trim()    || CFG.room;
-  CFG.speaker  = document.getElementById('cfg-speaker').value.trim() || CFG.speaker;
-  CFG.apiKey   = document.getElementById('cfg-api').value.trim()     || CFG.apiKey;
-  CFG.detail   = document.getElementById('cfg-detail').value         || CFG.detail;
-  CFG.provider = document.getElementById('cfg-provider').value       || CFG.provider;
-  CFG.baseUrl  = document.getElementById('cfg-base-url').value.trim()|| CFG.baseUrl;
+  CFG.room         = document.getElementById('cfg-room').value.trim()         || CFG.room;
+  CFG.speaker      = document.getElementById('cfg-speaker').value.trim()      || CFG.speaker;
+  CFG.apiKey       = document.getElementById('cfg-api').value.trim()          || CFG.apiKey;
+  CFG.detail       = document.getElementById('cfg-detail').value              || CFG.detail;
+  CFG.provider     = document.getElementById('cfg-provider').value            || CFG.provider;
+  CFG.baseUrl      = document.getElementById('cfg-base-url').value.trim()     || CFG.baseUrl;
+  CFG.asr          = document.getElementById('cfg-asr').value                 || CFG.asr;
+  CFG.xfAppId      = document.getElementById('cfg-xf-appid').value.trim()    || CFG.xfAppId;
+  CFG.xfApiKey     = document.getElementById('cfg-xf-apikey').value.trim()   || CFG.xfApiKey;
+  CFG.xfApiSecret  = document.getElementById('cfg-xf-apisecret').value.trim()|| CFG.xfApiSecret;
 
   // 模型：下拉 or 手填
   const p = PROVIDERS[CFG.provider] || PROVIDERS.qwen;
@@ -1559,7 +1679,11 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
     } else {
       onProviderChange(); // 初始化默认提供商 UI
     }
-    if(s.baseUrl) document.getElementById('cfg-base-url').value = s.baseUrl;
+    if(s.baseUrl)      document.getElementById('cfg-base-url').value    = s.baseUrl;
+    if(s.asr)          { document.getElementById('cfg-asr').value = s.asr; onAsrChange(); }
+    if(s.xfAppId)      document.getElementById('cfg-xf-appid').value     = s.xfAppId;
+    if(s.xfApiKey)     document.getElementById('cfg-xf-apikey').value    = s.xfApiKey;
+    if(s.xfApiSecret)  document.getElementById('cfg-xf-apisecret').value = s.xfApiSecret;
   } catch(e){ onProviderChange(); }
   renderRecords();
   updateRecBadge(loadRecords());
@@ -1568,7 +1692,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 
 <!--
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  SANI 会议助手 v3.1 · 部署指南
+  SANI 会议助手 v5 · 部署指南
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 【改版说明】
@@ -1611,8 +1735,44 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
   Chrome/Edge 打开页面 → 配置 API Key → 开始会议
 
 【API Key 获取】
-  dashscope.aliyun.com → API-KEY管理 → 创建新密钥
+  讯飞 ASR Key：console.xfyun.cn → 实时语音转写 → 获取 APPID/APIKey/APISecret
+纪要生成 Key：dashscope.aliyun.com / platform.deepseek.com 等
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 </body>
-</html>
+</html>// 纯文本降级导出
+async function exportWordRaw(raw, snap) {
+  const docxLib = window.docx;
+  if (!docxLib) throw new Error('docx 库未加载，请刷新重试');
+  const { Document, Packer, Paragraph, TextRun, AlignmentType, Header, Footer,
+          PageNumber, BorderStyle, TabStopType, TabStopPosition } = docxLib;
+  const room  = snap?.room || '会议';
+  const endAt = snap?.endAt || new Date().toLocaleString('zh-CN');
+  const F = 'Microsoft YaHei';
+  const doc = new Document({
+    sections:[{
+      properties:{ page:{ size:{width:11906,height:16838}, margin:{top:1440,right:1440,bottom:1440,left:1440} } },
+      headers:{ default: new Header({ children:[new Paragraph({
+        tabStops:[{type:TabStopType.RIGHT,position:TabStopPosition.MAX}],
+        border:{ bottom:{ style:BorderStyle.SINGLE,size:4,color:'CCCCCC' } },
+        children:[new TextRun({text:room,bold:true,size:18,color:'1A1A1A',font:F}),
+                  new TextRun({text:`	${endAt}`,size:16,color:'888888',font:F})]
+      })]}) },
+      footers:{ default: new Footer({ children:[new Paragraph({
+        alignment:AlignmentType.CENTER,
+        children:[new TextRun({text:'第 ',size:16,color:'888888'}),
+                  new TextRun({children:[PageNumber.CURRENT],size:16,color:'888888'}),
+                  new TextRun({text:' 页',size:16,color:'888888'})]
+      })]}) },
+      children: raw.split('\n').map(line => new Paragraph({
+        children:[new TextRun({text:line,size:22,font:F,color:'555555'})]
+      }))
+    }]
+  });
+  const buf = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(buf);
+  const a = document.createElement('a');
+  a.href = url; a.download = `会议纪要_${room}.docx`; a.click();
+  URL.revokeObjectURL(url);
+}
+
