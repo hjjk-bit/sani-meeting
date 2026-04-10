@@ -526,7 +526,16 @@ async function startXfAsr() {
     _xfWs.onmessage = e => {
       try {
         const d = JSON.parse(e.data);
-        if (d.code !== 0) { console.warn('讯飞错误', d.message); return; }
+        if (d.code !== 0) {
+          console.warn('讯飞错误', d.code, d.message);
+          if (d.code === 10110 || d.code === 10007 || d.code === 10313) {
+            // 鉴权失败，停止重连，降级到浏览器
+            _xfRunning = false;
+            console.warn('讯飞鉴权失败，降级到浏览器识别');
+            startBrowserAsr();
+          }
+          return;
+        }
         const ws = d.data?.result?.ws || [];
         const text = ws.map(w => w.cw.map(c=>c.w).join('')).join('');
         const isFinal = d.data?.result?.ls === true || d.data?.status === 2;
