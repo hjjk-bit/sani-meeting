@@ -469,23 +469,34 @@ let _xfWs = null;
 let _xfRecorder = null;
 let _xfRunning = false;
 
-function xfGetAuthUrl() {
-  const { xfAppId, xfApiKey, xfApiSecret } = CFG;
+function _u8ToBase64(u8) {
+  let bin = '';
+  for (let i = 0; i < u8.length; i++) bin += String.fromCharCode(u8[i]);
+  return btoa(bin);
+}
+
+async function xfGetAuthUrl() {
+  const { xfApiKey, xfApiSecret } = CFG;
   const host = 'iat-api.xfyun.cn';
   const path = '/v2/iat';
   const date = new Date().toUTCString();
-  const signStr = `host: ${host}\ndate: ${date}\nGET ${path} HTTP/1.1`;
-  // HMAC-SHA256 via SubtleCrypto
-  return crypto.subtle.importKey(
-    'raw', new TextEncoder().encode(xfApiSecret), { name:'HMAC', hash:'SHA-256' }, false, ['sign']
-  ).then(key => crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signStr)))
-   .then(sig => {
-    const b64 = btoa(String.fromCharCode(...new Uint8Array(sig)));
-    const auth = btoa(`api_key="${xfApiKey}", algorithm="hmac-sha256", headers="host date request-line", signature="${b64}"`);
-    return `wss://${host}${path}?authorization=${encodeURIComponent(auth)}&date=${encodeURIComponent(date)}&host=${encodeURIComponent(host)}`;
-  });
+  const signOrigin = `host: ${host}
+date: ${date}
+GET ${path} HTTP/1.1`;
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(xfApiSecret),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const sigBuf = await crypto.subtle.sign('HMAC', cryptoKey, new TextEncoder().encode(signOrigin));
+  const signature = _u8ToBase64(new Uint8Array(sigBuf));
+  const authorizationOrigin = `api_key="${xfApiKey}", algorithm="hmac-sha256", headers="host date request-line", signature="${signature}"`;
+  const authorization = btoa(authorizationOrigin);
+  const url = `wss://${host}${path}?authorization=${encodeURIComponent(authorization)}&date=${encodeURIComponent(date)}&host=${encodeURIComponent(host)}`;
+  console.log('[XF] date:', date);
+  console.log('[XF] signOrigin:', signOrigin);
+  console.log('[XF] signature:', signature);
+  return url;
 }
-
 async function startXfAsr() {
   if (!CFG.xfAppId || !CFG.xfApiKey || !CFG.xfApiSecret) {
     console.warn('讯飞配置不完整，降级到浏览器识别');
